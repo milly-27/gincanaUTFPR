@@ -1,0 +1,699 @@
+/* Importando fontes */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Pacifico&display=swap');
+
+/* Reset e configurações base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Paleta de cores elegante de padaria */
+    --primary: #8b6f47;
+    --secondary: #d4a574;
+    --accent: #f5e6d3;
+    --dark-brown: #5d4037;
+    --cream: #faf8f3;
+    --gold: #c9a961;
+    --bg-light: #fff;
+    --text-dark: #3e2723;
+    --text-light: #6d4c41;
+    --shadow-color: rgba(139, 111, 71, 0.15);
+    --shadow-sm: 0 4px 15px var(--shadow-color);
+    --shadow-md: 0 8px 25px var(--shadow-color);
+    --shadow-lg: 0 15px 50px rgba(139, 111, 71, 0.2);
+    --radius-md: 15px;
+    --radius-lg: 25px;
+    --transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Classe para esconder elementos */
+.hidden {
+    display: none !important;
+}
+
+/* Fundo elegante de padaria */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #faf8f3 0%, #f5e6d3 50%, #e8d5bf 100%);
+    background-size: 400% 400%;
+    animation: gradientDance 20s ease infinite;
+    color: var(--text-dark);
+    line-height: 1.7;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Partículas flutuantes decorativas */
+body::before {
+    content: '🍕 🍔 🍰 ☕ 🍩 🌮 🍦';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 3rem;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 1;
+    animation: float 20s infinite;
+    letter-spacing: 100px;
+    line-height: 200px;
+}
+
+@keyframes gradientDance {
+    0%, 100% { background-position: 0% 50%; }
+    25% { background-position: 50% 25%; }
+    50% { background-position: 100% 50%; }
+    75% { background-position: 50% 75%; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(5deg); }
+}
+
+/* Header profissional com glassmorphism */
+header {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 2px solid rgba(139, 111, 71, 0.1);
+    padding: 1.5rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(139, 111, 71, 0.08);
+    animation: slideDown 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes slideDown {
+    from { 
+        opacity: 0; 
+        transform: translateY(-100px) scale(0.9); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
+}
+
+.topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.topo h3 {
+    font-family: 'Pacifico', cursive;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: 2px;
+    filter: drop-shadow(2px 2px 4px rgba(139, 111, 71, 0.2));
+}
+
+/* Seção do usuário */
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Botão de login elegante */
+#btnLogin {
+    padding: 0.9rem 2rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: var(--transition);
+    box-shadow: 0 5px 20px rgba(139, 111, 71, 0.3);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#btnLogin::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+
+#btnLogin:hover::before {
+    left: 100%;
+}
+
+#btnLogin:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(139, 111, 71, 0.4);
+}
+
+#btnLogin:active {
+    transform: translateY(-2px) scale(0.98);
+}
+
+/* Informações do usuário logado - MELHORADO */
+.user-info {
+    background: linear-gradient(135deg, rgba(139, 111, 71, 0.15), rgba(212, 165, 116, 0.15));
+    padding: 0.9rem 2rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 5px 20px rgba(139, 111, 71, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    position: relative;
+    font-weight: 600;
+    color: var(--text-dark);
+    border: 2px solid rgba(139, 111, 71, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.user-info:hover {
+    background: linear-gradient(135deg, rgba(139, 111, 71, 0.25), rgba(212, 165, 116, 0.25));
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 10px 30px rgba(139, 111, 71, 0.35);
+    border-color: var(--primary);
+}
+
+/* Tooltip de logout - SUPER BONITO */
+.logout-tooltip {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    color: var(--text-dark);
+    padding: 0.8rem 1.3rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(139, 111, 71, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Ícone dentro do tooltip */
+.logout-tooltip::before {
+    content: '👋';
+    font-size: 1.1rem;
+    animation: wave 0.6s ease-in-out infinite;
+}
+
+/* Animação de aceno */
+@keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(15deg); }
+    75% { transform: rotate(-15deg); }
+}
+
+/* Setinha do tooltip */
+.logout-tooltip::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid #ffffff;
+    filter: drop-shadow(0 -2px 2px rgba(139, 111, 71, 0.1));
+}
+
+.user-info:hover .logout-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    animation: tooltipBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes tooltipBounce {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.8);
+    }
+    50% {
+        transform: translateY(2px) scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Menu elegante */
+.nav {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(15px);
+    padding: 1.2rem 0;
+    border-top: 1px solid rgba(139, 111, 71, 0.1);
+    box-shadow: 0 5px 20px rgba(139, 111, 71, 0.05);
+}
+
+.nav__menu {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0;
+    flex-wrap: wrap;
+}
+
+.nav__menu-item {
+    position: relative;
+}
+
+.nav__menu-item > a {
+    color: var(--text-dark);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    transition: var(--transition);
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(139, 111, 71, 0.1);
+    border: 2px solid rgba(139, 111, 71, 0.15);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.nav__menu-item > a:hover {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(139, 111, 71, 0.3);
+    border-color: var(--primary);
+}
+
+/* Submenu profissional */
+.nav__submenu {
+    list-style: none;
+    position: absolute;
+    top: calc(100% + 15px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px) scale(0.8);
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(139, 111, 71, 0.15);
+    border-radius: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+    min-width: 380px;
+    max-width: 480px;
+    padding: 1.5rem 1.2rem;
+    box-shadow: 0 15px 40px rgba(139, 111, 71, 0.15);
+    z-index: 100;
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.nav__submenu::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid rgba(139, 111, 71, 0.15);
+}
+
+/* Estilização da scrollbar do submenu */
+.nav__submenu::-webkit-scrollbar {
+    width: 8px;
+}
+
+.nav__submenu::-webkit-scrollbar-track {
+    background: rgba(139, 111, 71, 0.05);
+    border-radius: 10px;
+}
+
+.nav__submenu::-webkit-scrollbar-thumb {
+    background: var(--secondary);
+    border-radius: 10px;
+    transition: background 0.3s;
+}
+
+.nav__submenu::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+.nav__submenu-item a {
+    color: var(--text-dark);
+    padding: 1rem 1.4rem;
+    display: block;
+    transition: var(--transition);
+    text-decoration: none;
+    font-weight: 500;
+    border-radius: 15px;
+    margin-bottom: 0.7rem;
+    font-size: 0.93rem;
+    white-space: nowrap;
+    line-height: 1.5;
+}
+
+.nav__submenu-item:last-child a {
+    margin-bottom: 0;
+}
+
+.nav__submenu-item a:hover {
+    background: linear-gradient(135deg, var(--accent), var(--secondary));
+    color: var(--text-dark);
+    transform: translateX(10px) scale(1.03);
+    box-shadow: 0 5px 15px rgba(139, 111, 71, 0.2);
+}
+
+.nav__menu-item:hover .nav__submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* Conteúdo principal super animado */
+main {
+    padding: 4rem 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+section {
+    max-width: 1000px;
+    margin: 0 auto;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 30px;
+    padding: 4rem 3rem;
+    box-shadow: 0 20px 60px rgba(139, 111, 71, 0.15);
+    animation: popIn 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border: 2px solid rgba(139, 111, 71, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+section::before {
+    content: '🥐';
+    position: absolute;
+    font-size: 10rem;
+    opacity: 0.15;
+    top: -30px;
+    right: -30px;
+    animation: rotate 20s linear infinite;
+}
+
+section::after {
+    content: '🍰';
+    position: absolute;
+    font-size: 8rem;
+    opacity: 0.15;
+    bottom: -20px;
+    left: -20px;
+    animation: rotate 15s linear infinite reverse;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+section h2 {
+    font-family: 'Pacifico', cursive;
+    font-size: 2.8rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+section p {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+#loginPrompt {
+    margin-top: 2.5rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--accent), var(--secondary));
+    border-radius: 20px;
+    border: 2px solid rgba(139, 111, 71, 0.2);
+    position: relative;
+    z-index: 1;
+}
+
+#loginPrompt p {
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Rodapé elegante */
+footer {
+    padding: 2.5rem;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(20px);
+    color: var(--text-light);
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 500;
+    border-top: 2px solid rgba(139, 111, 71, 0.1);
+    margin-top: 4rem;
+    box-shadow: 0 -5px 20px rgba(139, 111, 71, 0.05);
+}
+
+/* Animações extras */
+@keyframes popIn {
+    from { 
+        opacity: 0; 
+        transform: scale(0.5) rotate(-10deg); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1) rotate(0); 
+    }
+}
+
+/* ========================================
+   MODAIS BONITOS DE CONFIRMAÇÃO E SUCESSO
+   ======================================== */
+
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.custom-modal-overlay.show {
+    opacity: 1;
+}
+
+.custom-modal-content {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 25px;
+    padding: 2.5rem;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 3px solid rgba(139, 111, 71, 0.2);
+    text-align: center;
+    transform: scale(0.8) translateY(-50px);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.custom-modal-overlay.show .custom-modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.custom-modal-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    animation: iconBounce 0.6s ease;
+}
+
+@keyframes iconBounce {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.custom-modal-icon.success {
+    font-size: 5rem;
+    animation: successPulse 0.8s ease;
+}
+
+@keyframes successPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.custom-modal-title {
+    font-family: 'Pacifico', cursive;
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.custom-modal-content.success .custom-modal-title {
+    color: #27ae60;
+}
+
+.custom-modal-message {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.custom-modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.custom-modal-btn {
+    padding: 0.9rem 2rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.custom-modal-btn-cancel {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    color: white;
+    box-shadow: 0 5px 15px rgba(149, 165, 166, 0.3);
+}
+
+.custom-modal-btn-cancel:hover {
+    background: linear-gradient(135deg, #7f8c8d, #6d7a7b);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(149, 165, 166, 0.4);
+}
+
+.custom-modal-btn-confirm {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+}
+
+.custom-modal-btn-confirm:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+}
+
+.custom-modal-btn:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .topo {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .topo h3 {
+        font-size: 2rem;
+    }
+    
+    .user-section {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .nav__menu {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+        padding: 0 1rem;
+    }
+    
+    .nav__menu-item {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .nav__menu-item > a {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .nav__submenu {
+        position: static;
+        transform: none;
+        margin-top: 0.5rem;
+        width: 100%;
+    }
+    
+    .nav__menu-item:hover .nav__submenu {
+        transform: none;
+    }
+    
+    section {
+        padding: 2.5rem 1.5rem;
+        border-radius: 30px;
+    }
+    
+    section h2 {
+        font-size: 2rem;
+    }
+    
+    section p {
+        font-size: 1rem;
+    }
+    
+    section::before,
+    section::after {
+        font-size: 4rem;
+    }
+}

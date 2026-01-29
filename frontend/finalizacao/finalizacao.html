@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Pagamento - Padaria AVAP</title>
+    <link rel="stylesheet" href="finalizacao.css">
+</head>
+<body>
+    <div class="container" id="app">
+        <!-- Carregando -->
+        <div class="loading-container" id="loadingScreen">
+            <div class="loading-card">
+                <div class="loading-spinner"></div>
+                <h2 class="loading-text">Carregando...</h2>
+                <p class="loading-subtext">Preparando finalização do pagamento</p>
+            </div>
+        </div>
+
+        <!-- Tela principal (oculta inicialmente) -->
+        <div id="mainScreen" style="display: none;">
+            <!-- Header -->
+            <div class="header-finalizacao">
+                <div class="header-content">
+                    <div class="header-info">
+                        <h1>Finalizar Pagamento</h1>
+                        <p class="user-name">Olá, <span id="userName">-</span></p>
+                        <p class="user-cpf">CPF: <span id="userCpf">-</span></p>
+                    </div>
+                    <div class="total-section">
+                        <p class="total-label">Total a pagar</p>
+                        <p class="total-valor" id="totalValor">R$ 0,00</p>
+                        <p class="total-itens"><span id="totalItens">0</span> itens</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid com 2 colunas: Resumo (esquerda) e Pagamento (direita) -->
+            <div class="content-grid">
+                <!-- COLUNA ESQUERDA: Resumo do Pedido -->
+                <div class="content-section">
+                    <h2 class="section-title">Resumo do Pedido</h2>
+                    <div class="pedido-itens" id="pedidoItens">
+                        <!-- Itens serão inseridos aqui -->
+                    </div>
+                </div>
+
+                <!-- COLUNA DIREITA: Forma de Pagamento -->
+                <div class="content-section">
+                    <h2 class="section-title">Forma de Pagamento</h2>
+                    <div class="formas-pagamento-grid" id="formasPagamentoGrid">
+                        <!-- Formas de pagamento serão inseridas aqui -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensagem de erro -->
+            <div id="errorContainer"></div>
+
+            <!-- Botões de ação -->
+            <div class="acoes-container">
+                <button class="btn btn-voltar" onclick="voltarCarrinho()">
+                    ← Voltar ao Carrinho
+                </button>
+                <button class="btn btn-confirmar" id="btnConfirmar" onclick="confirmarPagamento()" disabled>
+                    💳 Confirmar Pagamento
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal de Pagamento -->
+        <div class="modal-overlay" id="modalPagamento" style="display: none;">
+            <div class="modal-content">
+                <button class="modal-close" onclick="fecharModal()">✕</button>
+                <div id="modalPagamentoContainer">
+                    <!-- Conteúdo do modal será inserido aqui -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Tela de processamento -->
+        <div class="loading-container" id="processingScreen" style="display: none;">
+            <div class="loading-card">
+                <div class="loading-spinner"></div>
+                <h2 class="loading-text">Processando Pagamento...</h2>
+                <p class="loading-subtext">Por favor, aguarde</p>
+            </div>
+        </div>
+
+        <!-- Tela de sucesso -->
+        <div class="sucesso-container" id="successScreen" style="display: none;">
+            <div class="sucesso-card">
+                <svg class="sucesso-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h2 class="sucesso-titulo">Pagamento Aprovado!</h2>
+                <p class="sucesso-mensagem">Seu pedido foi confirmado com sucesso.</p>
+                <p class="pedido-numero">Pedido #<span id="pedidoNumero">-</span></p>
+                <p class="sucesso-redirect">Redirecionando para o menu...</p>
+            </div>
+        </div>
+
+        <!-- Tela de erro -->
+        <div class="erro-container" id="errorScreen" style="display: none;">
+            <div class="erro-card">
+                <svg class="erro-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h2 class="erro-titulo">Erro no Pagamento</h2>
+                <p class="erro-mensagem" id="errorMessage">Ocorreu um erro ao processar seu pagamento</p>
+                <button class="btn-tentar-novamente" onclick="tentarNovamente()">
+                    Tentar Novamente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="finalizacao.js"></script>
+</body>
+</html>

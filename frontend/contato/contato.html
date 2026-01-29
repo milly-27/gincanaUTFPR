@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contato - Padaria Doce Sabor</title>
+    <link rel="stylesheet" href="contato.css">
+</head>
+
+<body>
+    <header>
+        <h1>Fale Conosco</h1>
+        <p>Estamos sempre prontos para ouvir você!</p>
+    </header>
+
+    <main>
+        <div class="contact-container">
+            <!-- COLUNA ESQUERDA: Informações de Contato -->
+            <section class="contact-info">
+                <h2>Nossos Contatos</h2>
+                <p>Seja para fazer um pedido especial, dar um feedback ou apenas dizer um olá, estamos à disposição.</p>
+                <ul>
+                    <li>
+                        <strong>📍 Endereço</strong>
+                        <span>Rua dos Pães Frescos, 123<br>Bairro Saboroso, Cidade Doce - SP</span>
+                    </li>
+                    <li>
+                        <strong>📞 Telefone</strong>
+                        <span>(11) 1234-5678</span>
+                    </li>
+                    <li>
+                        <strong>📧 Email</strong>
+                        <span>padariadoce.sabor1988@gmail.com</span>
+                    </li>
+                    <li>
+                        <strong>🕒 Horário de Funcionamento</strong>
+                        <span>Segunda a Sábado, das 7h às 19h</span>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- COLUNA DIREITA: Formulário de Contato -->
+            <section class="contact-form-section">
+                <h2>Envie sua Mensagem</h2>
+                <form id="contactForm" class="contact-form">
+                    <div class="form-group">
+                        <label for="name">Seu Nome:</label>
+                        <input type="text" id="name" name="name" required placeholder="Digite seu nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Seu Email:</label>
+                        <input type="email" id="email" name="email" required placeholder="seu@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Assunto:</label>
+                        <input type="text" id="subject" name="subject" placeholder="Sobre o que você quer falar?">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Sua Mensagem:</label>
+                        <textarea id="message" name="message" rows="6" required placeholder="Escreva sua mensagem aqui..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Enviar Mensagem</button>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Padaria Doce Sabor</p>
+    </footer>
+
+    <div id="messageContainer" class="message-container"></div>
+
+    <script src="contato.js"></script>
+</body>
+
+</html>
