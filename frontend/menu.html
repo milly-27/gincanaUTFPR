@@ -1,69 +1,136 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Menu Principal</title>
-<link rel="stylesheet" href="menu.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Principal - Gincana</title>
+    <link rel="stylesheet" href="menu.css">
 </head>
 <body>
-<header>
-<div class="topo">
-<h3>Menu Principal</h3>
-<div class="user-section">
-<button id="btnLogin" class="hidden" onclick="window.location.href='./auth/login.html'">Login</button>
-<div id="userInfo" class="user-info hidden">
-<span id="userName"></span>
-<span class="logout-tooltip">Clique para deslogar</span>
-</div>
-</div>
-</div>
-<nav class="nav">
-<ul class="nav__menu">
-<li class="nav__menu-item"><a href="#">Home</a></li>
-<li class="nav__menu-item" id="menuCadastros" style="display: none;">
-<a href="#">Cadastros</a>
-<ul class="nav__submenu">
-<li class="nav__submenu-item"><a href="http://localhost:3001/pessoas/abrirCrudPessoa">Pessoa</a></li>
-<li class="nav__submenu-item"><a href="http://localhost:3001/cargos/abrirCrudCargo">Cargo</a></li>
-<li class="nav__submenu-item"><a href="http://localhost:3001/produtos/abrirCrudProduto">Produto</a></li>
-<li class="nav__submenu-item"><a href="http://localhost:3001/categorias/abrirCrudCategoria">Categoria</a></li>
-<li class="nav__submenu-item"><a href="http://localhost:3001/pedido/abrirCrudPedido">Pedido</a></li>
-<li class="nav__submenu-item"><a href="http://localhost:3001/pagamento/abrirCrudPagamento">Pagamento</a></li>
-<li class="nav__submenu-item"><a href="http://localhost:3001/forma_pagamentos/abrirCrudForma_pagamento">Formas de Pagamento</a></li>
-<li class="nav__submenu-item"><a href="http://localhost:3001/pagamento_has_formapagamentos/abrirCrudpagamento_has_formapagamento">Pagamento e Formas de Pagamento</a></li>
-</ul>
-</li>
-<li class="nav__menu-item"><a href="http://localhost:3001/cardapio/abrirCardapio">Cardápio</a></li>
-<!-- NOVO: Menu Minhas Compras - só aparece logado -->
-<li class="nav__menu-item" id="menuMinhasCompras" style="display: none;">
-<a href="./compras/compras.html">🛍️ Minhas Compras</a>
-</li>
-<li class="nav__menu-item"><a href="./blog/blog.html">Blog</a></li>
-<li class="nav__menu-item"><a href="./contato/contato.html">Contact</a></li>
-<li class="nav__menu-item" id="menuRelatorios" style="display: none;">
-<a href="#">Relatórios</a>
-<ul class="nav__submenu">
-<li class="nav__submenu-item"><a href="./relatorios/vendas-mensais.html">Vendas Mensais</a></li>
-<li class="nav__submenu-item"><a href="./relatorios/produtos-mais-vendidos.html">Produtos Mais Vendidos</a></li>
-<li class="nav__submenu-item"><a href="./relatorios/clientes-mais-compram.html">Clientes Que Mais Compram</a></li>
-</ul>
-</li>
-</ul>
-</nav>
-</header>
-<main>
-<section>
-<h2 id="welcomeTitle">Tradição e Sabor</h2>
-<p id="welcomeMessage">Feito com carinho, assado com amor. Experimente o melhor da confeitaria artesanal.</p>
-<div id="loginPrompt">
-<p><strong>🍞 Acesse sua conta para fazer pedidos e conferir nossas novidades diárias</strong></p>
-</div>
-</section>
-</main>
-<footer>
-<p>&copy; 2025 - Sistema AVAP</p>
-</footer>
-<script src="menu.js"></script>
+    <header>
+        <div class="topo">
+            <h3 id="menuTitle">🏆 GINCANA 2025</h3>
+            <div class="user-section">
+                <button id="btnLogin" class="hidden" onclick="window.location.href='./auth/auth.html'">Login</button>
+                <div id="userInfo" class="user-info hidden">
+                    <span id="userName"></span>
+                    <span class="logout-tooltip">Clique para deslogar</span>
+                </div>
+            </div>
+        </div>
+        <nav class="nav">
+            <ul class="nav__menu">
+                <li class="nav__menu-item"><a href="#">🏠 Home</a></li>
+                
+                <li class="nav__menu-item" id="menuCadastros" style="display: none;">
+                    <a href="#">⚙️ Cadastros</a>
+                    <ul class="nav__submenu">
+                        <li class="nav__submenu-item"><a href="http://localhost:3001/pessoas/abrirCrudPessoa">👥 Pessoa</a></li>
+                        <li class="nav__submenu-item"><a href="http://localhost:3001/cargos/abrirCrudCargo">💼 Cargo</a></li>
+                        <li class="nav__submenu-item"><a href="http://localhost:3001/produtos/abrirCrudProduto">📦 Produto</a></li>
+                        <li class="nav__submenu-item"><a href="http://localhost:3001/categorias/abrirCrudCategoria">🏷️ Categoria</a></li>
+                        <li class="nav__submenu-item"><a href="http://localhost:3001/pedido/abrirCrudPedido">🛒 Pedido</a></li>
+                        <li class="nav__submenu-item"><a href="http://localhost:3001/pagamento/abrirCrudPagamento">💳 Pagamento</a></li>
+                        <li class="nav__submenu-item"><a href="http://localhost:3001/forma_pagamentos/abrirCrudForma_pagamento">💰 Formas de Pagamento</a></li>
+                        <li class="nav__submenu-item"><a href="http://localhost:3001/pagamento_has_formapagamentos/abrirCrudpagamento_has_formapagamento">🔗 Pagamento e Formas</a></li>
+                    </ul>
+                </li>
+                
+                <li class="nav__menu-item"><a href="http://localhost:3001/cardapio/abrirCardapio">📋 Cardápio</a></li>
+                
+                <li class="nav__menu-item" id="menuMinhasCompras" style="display: none;">
+                    <a href="./compras/compras.html">🛍️ Minhas Compras</a>
+                </li>
+                
+                <li class="nav__menu-item"><a href="./blog/blog.html">📰 Blog</a></li>
+                <li class="nav__menu-item"><a href="./contato/contato.html">📞 Contato</a></li>
+                
+                <li class="nav__menu-item" id="menuRelatorios" style="display: none;">
+                    <a href="#">📊 Relatórios</a>
+                    <ul class="nav__submenu">
+                        <li class="nav__submenu-item"><a href="./relatorios/vendas-mensais.html">📈 Vendas Mensais</a></li>
+                        <li class="nav__submenu-item"><a href="./relatorios/produtos-mais-vendidos.html">🔥 Produtos Mais Vendidos</a></li>
+                        <li class="nav__submenu-item"><a href="./relatorios/clientes-mais-compram.html">⭐ Clientes Que Mais Compram</a></li>
+                    </ul>
+                </li>
+                
+                <li class="nav__menu-item" id="menuConfiguracoes" style="display: none;">
+                    <a href="#" onclick="abrirModalTema(); return false;">🎨 Personalizar Tema</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <section>
+            <h2 id="welcomeTitle">Bem-vindo à Gincana!</h2>
+            <p id="welcomeMessage">Participe das competições e mostre seu talento!</p>
+            <div id="loginPrompt">
+                <p><strong>🏆 Faça login para participar das atividades e acompanhar sua pontuação!</strong></p>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p id="footerText">&copy; 2025 - Sistema de Gincana</p>
+    </footer>
+
+    <!-- Modal de Personalização de Tema -->
+    <div id="modalTema" class="custom-modal-overlay">
+        <div class="custom-modal-content tema-modal">
+            <div class="custom-modal-icon">🎨</div>
+            <h3 class="custom-modal-title">Personalizar Tema da Gincana</h3>
+            
+            <form id="formTema" class="tema-form">
+                <div class="form-group-tema">
+                    <label for="nomeTema">🏆 Nome da Gincana:</label>
+                    <input type="text" id="nomeTema" placeholder="Ex: Gincana Cultural" maxlength="30" required>
+                </div>
+                
+                <div class="form-group-tema">
+                    <label for="descricaoTema">📝 Descrição:</label>
+                    <input type="text" id="descricaoTema" placeholder="Ex: Competição Anual" maxlength="50">
+                </div>
+                
+                <div class="form-group-tema">
+                    <label for="corPrimaria">🎨 Cor Primária:</label>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="corPrimaria" value="#FF6B35">
+                        <span class="color-preview" id="previewPrimaria"></span>
+                    </div>
+                </div>
+                
+                <div class="form-group-tema">
+                    <label for="corSecundaria">🎨 Cor Secundária:</label>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="corSecundaria" value="#F7931E">
+                        <span class="color-preview" id="previewSecundaria"></span>
+                    </div>
+                </div>
+                
+                <div class="form-group-tema">
+                    <label for="corFundo">🎨 Cor de Fundo:</label>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="corFundo" value="#F0F4F8">
+                        <span class="color-preview" id="previewFundo"></span>
+                    </div>
+                </div>
+                
+                <div class="custom-modal-actions">
+                    <button type="button" class="custom-modal-btn custom-modal-btn-cancel" onclick="fecharModalTema()">
+                        Cancelar
+                    </button>
+                    <button type="button" class="custom-modal-btn custom-modal-btn-reset" onclick="resetarTema()">
+                        Resetar
+                    </button>
+                    <button type="submit" class="custom-modal-btn custom-modal-btn-confirm">
+                        Salvar Tema
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="menu.js"></script>
 </body>
 </html>

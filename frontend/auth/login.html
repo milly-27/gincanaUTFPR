@@ -1,81 +1,173 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - PARDARIA</title>
-<link rel="stylesheet" href="login.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autenticação - Sistema de Gincana</title>
+    <link rel="stylesheet" href="login.css">
 </head>
 <body>
-<div class="container">
-<div class="login-card">
-<div class="logo">
-<h1>🍞 PARDARIA</h1>
-<p>Padaria Artesanal</p>
-</div>
-<div class="form-content-area">
-<div class="tab-content active">
-<h2>Login</h2>
-<form id="loginForm">
-<div class="form-group">
-<label for="loginEmail">Email:</label>
-<input type="email" id="loginEmail" name="email" required>
-</div>
-<div class="form-group">
-<label for="loginSenha">Senha:</label>
-<input type="password" id="loginSenha" name="senha" maxlength="20" required>
-</div>
-<div style="text-align: right; margin-top: -10px; margin-bottom: 15px;">
-<a href="forgot-password.html" style="color: var(--cor-link-acao); text-decoration: none; font-size: 0.9em; font-weight: 600;">
-Esqueci minha senha
-</a>
-</div>
-<button type="submit" class="btn-login">Entrar</button>
-<div id="mensagem" class="mensagem"></div>
-</form>
-<p class="register-link">
-Não tem conta? <a href="register.html">Cadastre-se aqui</a>
-</p>
-</div>
-</div>
-</div>
-</div>
-<script type="module">
-import { login, mostrarMensagem } from './auth.js';
+    <div class="confetti-container" id="confettiContainer"></div>
+    
+    <div class="container">
+        <div class="auth-card">
+            <div class="logo">
+                <div class="mascot-container" id="mascotContainer">
+                    <div class="mascot-3d" id="mascot3d">
+                        <div class="trophy-3d">
+                            <div class="trophy-front face">
+                                <div class="trophy-body">
+                                    <div class="trophy-cup">
+                                        <div class="cup-top"></div>
+                                        <div class="cup-middle"></div>
+                                        <div class="cup-bottom"></div>
+                                    </div>
+                                    <div class="trophy-handles">
+                                        <div class="handle handle-left"></div>
+                                        <div class="handle handle-right"></div>
+                                    </div>
+                                    <div class="trophy-base">
+                                        <div class="base-top"></div>
+                                        <div class="base-middle"></div>
+                                        <div class="base-bottom"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="trophy-face">
+                                    <div class="star-decoration">⭐</div>
+                                    
+                                    <div class="eyes">
+                                        <div class="eye eye-left">
+                                            <div class="eye-white"></div>
+                                            <div class="pupil" id="pupilLeft"></div>
+                                            <div class="eye-shine"></div>
+                                        </div>
+                                        <div class="eye eye-right">
+                                            <div class="eye-white"></div>
+                                            <div class="pupil" id="pupilRight"></div>
+                                            <div class="eye-shine"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="eyebrows">
+                                        <div class="eyebrow eyebrow-left" id="eyebrowLeft"></div>
+                                        <div class="eyebrow eyebrow-right" id="eyebrowRight"></div>
+                                    </div>
+                                    
+                                    <div class="mouth" id="mouth"></div>
+                                    
+                                    <div class="blush blush-left"></div>
+                                    <div class="blush blush-right"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h1 id="logoTitle" class="logo-title">GINCANA 2025</h1>
+                <p id="logoSubtitle" class="logo-subtitle">Sistema de Competições</p>
+                
+                <div class="floating-icons">
+                    <span class="float-icon">🎯</span>
+                    <span class="float-icon">⭐</span>
+                    <span class="float-icon">🎪</span>
+                    <span class="float-icon">🎨</span>
+                    <span class="float-icon">🎭</span>
+                </div>
+            </div>
+            
+            <div class="form-content-area">
+                <div class="speech-bubble" id="speechBubble">
+                    <p id="speechText">Olá! Pronto para a gincana? 🎉</p>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="login">
+                        <span class="tab-icon">🔑</span> Login
+                    </button>
+                    <button class="tab-button" data-tab="cadastro">
+                        <span class="tab-icon">✨</span> Cadastro
+                    </button>
+                </div>
 
-const loginForm = document.getElementById('loginForm');
-const mensagem = document.getElementById('mensagem');
+                <div class="tab-content active" id="loginTab">
+                    <h2>Bem-vindo de Volta!</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="loginEmail">
+                                <span class="label-icon">📧</span> Email:
+                            </label>
+                            <input type="email" id="loginEmail" name="email" placeholder="seu@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginSenha">
+                                <span class="label-icon">🔒</span> Senha:
+                            </label>
+                            <div class="password-wrapper">
+                                <input type="password" id="loginSenha" name="senha" maxlength="20" placeholder="Digite sua senha" required>
+                                <button type="button" class="toggle-password" id="toggleLoginPassword">
+                                    <span class="eye-icon">👁️</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div style="text-align: right; margin-top: -10px; margin-bottom: 15px;">
+                            <a href="forgot-password.html" class="link-esqueci-senha">
+                                🤔 Esqueci minha senha
+                            </a>
+                        </div>
+                        <button type="submit" class="btn-submit">
+                            <span class="btn-text">Entrar</span>
+                            <span class="btn-icon">🚀</span>
+                        </button>
+                        <div id="mensagemLogin" class="mensagem"></div>
+                    </form>
+                </div>
 
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+                <div class="tab-content" id="cadastroTab">
+                    <h2>Junte-se à Gincana!</h2>
+                    <form id="cadastroForm">
+                        <div class="form-group">
+                            <label for="regNome">
+                                <span class="label-icon">👤</span> Nome Completo:
+                            </label>
+                            <input type="text" id="regNome" name="nome" maxlength="100" placeholder="Seu nome aqui" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regCpf">
+                                <span class="label-icon">🆔</span> CPF:
+                            </label>
+                            <input type="text" id="regCpf" name="cpf" maxlength="14" placeholder="000.000.000-00" required>
+                            <small>Digite apenas números</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="regEmail">
+                                <span class="label-icon">📧</span> Email:
+                            </label>
+                            <input type="email" id="regEmail" name="email" maxlength="100" placeholder="seu@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regSenha">
+                                <span class="label-icon">🔒</span> Senha:
+                            </label>
+                            <div class="password-wrapper">
+                                <input type="password" id="regSenha" name="senha" maxlength="20" minlength="6" placeholder="Mínimo 6 caracteres" required>
+                                <button type="button" class="toggle-password" id="toggleRegPassword">
+                                    <span class="eye-icon">👁️</span>
+                                </button>
+                            </div>
+                            <small>Mínimo 6 caracteres, máximo 20</small>
+                        </div>
+                        <button type="submit" class="btn-submit">
+                            <span class="btn-text">Cadastrar</span>
+                            <span class="btn-icon">🎉</span>
+                        </button>
+                        <div id="mensagemCadastro" class="mensagem"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    const email = document.getElementById('loginEmail').value.trim();
-    const senha = document.getElementById('loginSenha').value;
-    
-    const btn = loginForm.querySelector('.btn-login');
-    const originalText = btn.textContent;
-    btn.textContent = 'Entrando...';
-    btn.disabled = true;
-    
-    try {
-        const data = await login(email, senha);
-        
-        if (data.logged && data.user) {
-            mostrarMensagem(mensagem, 'Login realizado com sucesso! Redirecionando...', 'sucesso');
-            setTimeout(() => {
-                window.location.href = '../menu.html';
-            }, 1500);
-        } else {
-            mostrarMensagem(mensagem, data.error || 'Email ou senha incorretos', 'erro');
-        }
-    } catch (err) {
-        console.error(err);
-        mostrarMensagem(mensagem, 'Falha na conexão com o servidor', 'erro');
-    } finally {
-        btn.textContent = originalText;
-        btn.disabled = false;
-    }
-});
-</script>
+    <script type="module" src="login.js"></script>
 </body>
 </html>
