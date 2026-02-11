@@ -22,6 +22,192 @@ function deletarTodasSessoes() {
 }
 
 // ========================================
+// SISTEMA DE TEMAS PERSONALIZÁVEIS
+// ========================================
+
+function carregarTema() {
+    const temaSalvo = localStorage.getItem('gincana_tema');
+    
+    if (temaSalvo) {
+        const tema = JSON.parse(temaSalvo);
+        aplicarTema(tema);
+    } else {
+        aplicarTemaAnoAtual();
+    }
+}
+
+function aplicarTema(tema) {
+    if (!tema) return;
+    
+    const anoAtual = new Date().getFullYear();
+    
+    // Atualizar título
+    const menuTitle = document.getElementById('menuTitle');
+    if (menuTitle && tema.nome) {
+        menuTitle.textContent = `🏆 ${tema.nome.toUpperCase()} ${anoAtual}`;
+    }
+    
+    // Atualizar footer
+    const footerText = document.getElementById('footerText');
+    if (footerText) {
+        if (tema.nome) {
+            footerText.textContent = `© ${anoAtual} - ${tema.nome}`;
+        } else {
+            footerText.textContent = `© ${anoAtual} - Sistema de Gincana`;
+        }
+    }
+    
+    // Aplicar cores CSS
+    if (tema.corPrimaria) {
+        document.documentElement.style.setProperty('--primary', tema.corPrimaria);
+    }
+    
+    if (tema.corSecundaria) {
+        document.documentElement.style.setProperty('--secondary', tema.corSecundaria);
+    }
+    
+    if (tema.corFundo) {
+        document.documentElement.style.setProperty('--bg-light', tema.corFundo);
+    }
+    
+    console.log('🎨 Tema aplicado:', tema);
+}
+
+function aplicarTemaAnoAtual() {
+    const anoAtual = new Date().getFullYear();
+    
+    const menuTitle = document.getElementById('menuTitle');
+    if (menuTitle) {
+        menuTitle.textContent = `🏆 GINCANA ${anoAtual}`;
+    }
+    
+    const footerText = document.getElementById('footerText');
+    if (footerText) {
+        footerText.textContent = `© ${anoAtual} - Sistema de Gincana`;
+    }
+}
+
+// ========================================
+// MODAL DE PERSONALIZAÇÃO DE TEMA
+// ========================================
+
+function abrirModalTema() {
+    const modal = document.getElementById('modalTema');
+    if (!modal) return;
+    
+    // Carregar valores atuais
+    const temaSalvo = localStorage.getItem('gincana_tema');
+    
+    if (temaSalvo) {
+        const tema = JSON.parse(temaSalvo);
+        document.getElementById('nomeTema').value = tema.nome || '';
+        document.getElementById('descricaoTema').value = tema.descricao || '';
+        document.getElementById('corPrimaria').value = tema.corPrimaria || '#FF6B35';
+        document.getElementById('corSecundaria').value = tema.corSecundaria || '#F7931E';
+        document.getElementById('corFundo').value = tema.corFundo || '#F0F4F8';
+    }
+    
+    // Atualizar previews
+    atualizarPreviews();
+    
+    modal.classList.add('show');
+}
+
+function fecharModalTema() {
+    const modal = document.getElementById('modalTema');
+    if (!modal) return;
+    
+    modal.classList.remove('show');
+}
+
+function atualizarPreviews() {
+    const corPrimaria = document.getElementById('corPrimaria').value;
+    const corSecundaria = document.getElementById('corSecundaria').value;
+    const corFundo = document.getElementById('corFundo').value;
+    
+    document.getElementById('previewPrimaria').style.background = corPrimaria;
+    document.getElementById('previewSecundaria').style.background = corSecundaria;
+    document.getElementById('previewFundo').style.background = corFundo;
+}
+
+function resetarTema() {
+    if (confirm('Deseja resetar o tema para as configurações padrão?')) {
+        localStorage.removeItem('gincana_tema');
+        
+        // Valores padrão
+        document.getElementById('nomeTema').value = 'GINCANA';
+        document.getElementById('descricaoTema').value = 'Sistema de Competições';
+        document.getElementById('corPrimaria').value = '#FF6B35';
+        document.getElementById('corSecundaria').value = '#F7931E';
+        document.getElementById('corFundo').value = '#F0F4F8';
+        
+        atualizarPreviews();
+        
+        // Aplicar tema padrão
+        const temapadrao = {
+            nome: 'GINCANA',
+            descricao: 'Sistema de Competições',
+            corPrimaria: '#FF6B35',
+            corSecundaria: '#F7931E',
+            corFundo: '#F0F4F8'
+        };
+        
+        aplicarTema(temapadrao);
+        
+        mostrarMensagem('Tema resetado com sucesso!', 'sucesso');
+    }
+}
+
+// Event listeners para os color pickers
+document.addEventListener('DOMContentLoaded', () => {
+    const corPrimaria = document.getElementById('corPrimaria');
+    const corSecundaria = document.getElementById('corSecundaria');
+    const corFundo = document.getElementById('corFundo');
+    
+    if (corPrimaria) {
+        corPrimaria.addEventListener('input', atualizarPreviews);
+    }
+    
+    if (corSecundaria) {
+        corSecundaria.addEventListener('input', atualizarPreviews);
+    }
+    
+    if (corFundo) {
+        corFundo.addEventListener('input', atualizarPreviews);
+    }
+});
+
+// Formulário de tema
+const formTema = document.getElementById('formTema');
+if (formTema) {
+    formTema.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const tema = {
+            nome: document.getElementById('nomeTema').value.trim() || 'GINCANA',
+            descricao: document.getElementById('descricaoTema').value.trim() || 'Sistema de Competições',
+            corPrimaria: document.getElementById('corPrimaria').value,
+            corSecundaria: document.getElementById('corSecundaria').value,
+            corFundo: document.getElementById('corFundo').value
+        };
+        
+        // Salvar no localStorage
+        localStorage.setItem('gincana_tema', JSON.stringify(tema));
+        
+        // Aplicar tema
+        aplicarTema(tema);
+        
+        // Fechar modal
+        fecharModalTema();
+        
+        // Mostrar mensagem de sucesso
+        mostrarModalSucesso('Tema Salvo!', 'As alterações foram aplicadas com sucesso!');
+        
+        console.log('🎨 Novo tema salvo:', tema);
+    });
+}
+
+// ========================================
 // MODAIS BONITOS
 // ========================================
 
@@ -103,6 +289,10 @@ function mostrarModalSucesso(titulo, mensagem) {
     }, 2000);
 }
 
+function mostrarMensagem(texto, tipo = 'info') {
+    mostrarModalSucesso(tipo === 'sucesso' ? 'Sucesso!' : 'Informação', texto);
+}
+
 // ========================================
 // CONTROLE DE VISIBILIDADE DOS MENUS
 // ========================================
@@ -111,6 +301,7 @@ function controlarMenus(isGerente, isLogado) {
     const menuCadastros = document.getElementById('menuCadastros');
     const menuRelatorios = document.getElementById('menuRelatorios');
     const menuMinhasCompras = document.getElementById('menuMinhasCompras');
+    const menuConfiguracoes = document.getElementById('menuConfiguracoes');
     
     console.log('🔐 Controlando menus - É gerente?', isGerente, '- Está logado?', isLogado);
     
@@ -118,11 +309,13 @@ function controlarMenus(isGerente, isLogado) {
     if (isGerente) {
         if (menuCadastros) menuCadastros.style.display = 'block';
         if (menuRelatorios) menuRelatorios.style.display = 'block';
-        console.log('✅ Menus de Cadastros e Relatórios LIBERADOS');
+        if (menuConfiguracoes) menuConfiguracoes.style.display = 'block';
+        console.log('✅ Menus de Cadastros, Relatórios e Configurações LIBERADOS');
     } else {
         if (menuCadastros) menuCadastros.style.display = 'none';
         if (menuRelatorios) menuRelatorios.style.display = 'none';
-        console.log('🔒 Menus de Cadastros e Relatórios BLOQUEADOS');
+        if (menuConfiguracoes) menuConfiguracoes.style.display = 'none';
+        console.log('🔒 Menus de Cadastros, Relatórios e Configurações BLOQUEADOS');
     }
     
     // Menu Minhas Compras - para qualquer usuário logado
@@ -138,6 +331,7 @@ function controlarMenus(isGerente, isLogado) {
 // ========================================
 // ATUALIZAR INTERFACE DO USUÁRIO
 // ========================================
+
 function atualizarInterfaceUsuario(userData = null) {
     console.log('🔄 Atualizando interface do usuário:', userData);
     
@@ -154,7 +348,6 @@ function atualizarInterfaceUsuario(userData = null) {
     }
     
     if (userData && userData.nome) {
-        // Usuário está logado
         console.log('👤 Usuário logado:', userData.nome);
         console.log('🔰 É gerente?', userData.isGerente);
         
@@ -171,7 +364,7 @@ function atualizarInterfaceUsuario(userData = null) {
         
         if (userData.isGerente) {
             const badgeSpan = document.createElement('span');
-            badgeSpan.textContent = '👑 Gerente';
+            badgeSpan.textContent = '👑 Organizador';
             badgeSpan.style.cssText = `
                 font-size: 0.75rem;
                 font-weight: 600;
@@ -191,18 +384,16 @@ function atualizarInterfaceUsuario(userData = null) {
         userInfo.onclick = logout;
         
         if (userData.isGerente) {
-            if (welcomeTitle) welcomeTitle.textContent = `Bem-vindo gerente, ${userData.nome}! 🍞`;
-            if (welcomeMessage) welcomeMessage.textContent = 'Você tem acesso total ao sistema. Use o menu acima para gerenciar cadastros e visualizar relatórios.';
+            if (welcomeTitle) welcomeTitle.textContent = `Bem-vindo, ${userData.nome}! 🏆`;
+            if (welcomeMessage) welcomeMessage.textContent = 'Você tem acesso total ao sistema. Gerencie as atividades e personalize o tema da gincana.';
         } else {
-            if (welcomeTitle) welcomeTitle.textContent = `Seja bem-vindo, ${userData.nome}! 🍞`;
-            if (welcomeMessage) welcomeMessage.textContent = 'Explore nosso cardápio e faça seus pedidos. Acesse "Minhas Compras" para ver seu histórico.';
+            if (welcomeTitle) welcomeTitle.textContent = `Seja bem-vindo, ${userData.nome}! 🎯`;
+            if (welcomeMessage) welcomeMessage.textContent = 'Participe das atividades, acumule pontos e acompanhe seu desempenho!';
         }
         
-        // Controlar menus - passa isGerente e isLogado=true
         controlarMenus(userData.isGerente, true);
         
     } else {
-        // Usuário não está logado
         console.log('👤 Nenhum usuário logado');
         
         btnLogin.classList.remove('hidden');
@@ -210,10 +401,9 @@ function atualizarInterfaceUsuario(userData = null) {
         if (loginPrompt) loginPrompt.style.display = 'block';
         if (userName) userName.innerHTML = '';
         
-        if (welcomeTitle) welcomeTitle.textContent = 'Tradição e Sabor';
-        if (welcomeMessage) welcomeMessage.textContent = 'Feito com carinho, assado com amor. Experimente o melhor da confeitaria artesanal.';
+        if (welcomeTitle) welcomeTitle.textContent = 'Bem-vindo à Gincana!';
+        if (welcomeMessage) welcomeMessage.textContent = 'Participe das competições e mostre seu talento!';
         
-        // Ocultar todos os menus restritos
         controlarMenus(false, false);
     }
 }
@@ -348,6 +538,10 @@ function redirecionarLogin() {
 function inicializarMenu() {
     console.log('🚀 Menu carregado, inicializando...');
     
+    // Carregar tema
+    carregarTema();
+    
+    // Verificar login
     verificarSeUsuarioEstaLogado();
     
     const btnLogin = document.getElementById('btnLogin');
@@ -378,6 +572,7 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         fecharModalConfirmacao();
+        fecharModalTema();
     }
 });
 
@@ -390,3 +585,6 @@ window.redirecionarLogin = redirecionarLogin;
 window.verificarSeUsuarioEstaLogado = verificarSeUsuarioEstaLogado;
 window.fecharModalConfirmacao = fecharModalConfirmacao;
 window.confirmarModalConfirmacao = confirmarModalConfirmacao;
+window.abrirModalTema = abrirModalTema;
+window.fecharModalTema = fecharModalTema;
+window.resetarTema = resetarTema;
