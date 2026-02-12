@@ -1,116 +1,91 @@
-//import { query } from '../database.js';
 const { query } = require('../database');
-// Funções do controller
-
 const path = require('path');
+const bcrypt = require('bcrypt');
 
+// Abrir página HTML do CRUD
 exports.abrirCrudPessoa = (req, res) => {
-//  console.log('pessoaController - Rota /abrirCrudPessoa - abrir o crudPessoa');
+  console.log('pessoaController - Rota /abrirCrudPessoa');
   res.sendFile(path.join(__dirname, '../../frontend/pessoa/pessoa.html'));
-}
+};
 
+// Listar todas as pessoas (sem mostrar senha)
 exports.listarPessoas = async (req, res) => {
   try {
-    let result;
-    if (global.useMockData) {
-      result = await global.mockDatabase.listarPessoas();
-    } else {
-      result = await query("SELECT * FROM pessoa ORDER BY cpf");
-    }
+    const result = await query('SELECT id, nome, email FROM pessoa ORDER BY id');
     res.json(result.rows);
   } catch (error) {
     console.error('Erro ao listar pessoas:', error);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
-}
+};
 
+// Criar nova pessoa
 exports.criarPessoa = async (req, res) => {
   try {
-    const { cpf, nome_pessoa, email_pessoa, senha_pessoa } = req.body;
+    const { nome, email, senha } = req.body;
 
-    // Validação básica
-    if (!nome_pessoa || !email_pessoa || !senha_pessoa || !cpf) {
-      return res.status(400).json({
-        error: 'Nome, email, senha e CPF são obrigatórios'
-      });
+    // Validações básicas
+    if (!nome) {
+      return res.status(400).json({ error: 'Nome é obrigatório' });
+    }
+    if (!email) {
+      return res.status(400).json({ error: 'Email é obrigatório' });
+    }
+    if (!senha) {
+      return res.status(400).json({ error: 'Senha é obrigatória' });
     }
 
-    // Validação de email básica
+    // Validação de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email_pessoa)) {
-      return res.status(400).json({
-        error: 'Formato de email inválido'
-      });
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Email inválido' });
     }
 
-    let result;
-    if (global.useMockData) {
-      // Verificar se email já existe
-      const emailExiste = await global.mockDatabase.verificarEmailExiste(email_pessoa);
-      if (emailExiste.rows.length > 0) {
-        return res.status(400).json({
-          error: 'Email já está em uso'
-        });
-      }
-      
-      result = await global.mockDatabase.criarPessoa({
-        id_pessoa, cpf_pessoa, nome_pessoa, email_pessoa, senha_pessoa
-      });
-    } else {
-      let queryText, queryParams;
-      
-      queryText = 'INSERT INTO pessoa (cpf, nome_pessoa, email_pessoa, senha_pessoa) VALUES ($1, $2, $3, $4) RETURNING *';
-      queryParams = [cpf, nome_pessoa, email_pessoa, senha_pessoa];
-
-      result = await query(queryText, queryParams);
+    // Validação de senha (mínimo 6 caracteres)
+    if (senha.length < 6) {
+      return res.status(400).json({ error: 'Senha deve ter no mínimo 6 caracteres' });
     }
+
+    // Criptografar senha
+    const saltRounds = 10;
+    const senhaHash = await bcrypt.hash(senha, saltRounds);
+
+    const result = await query(
+      'INSERT INTO pessoa (nome, email, senha) VALUES ($1, $2, $3) RETURNING id, nome, email',
+      [nome, email.toLowerCase(), senhaHash]
+    );
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Erro ao criar pessoa:', error);
 
-    // Verifica se é erro de email duplicado (constraint unique violation)
-    if (error.code === '23505' && error.constraint === 'pessoa_email_pessoa_key') {
-      return res.status(400).json({
-        error: 'Email já está em uso'
-      });
-    }
-
-    // Verifica se é erro de CPF duplicado
-    if (error.code === '23505' && error.constraint === 'pessoa_cpf_pessoa_key') {
-      return res.status(400).json({
-        error: 'CPF já está em uso'
-      });
-    }
-
-    // Verifica se é erro de violação de constraint NOT NULL
+    // Erro de violação de constraint NOT NULL
     if (error.code === '23502') {
-      return res.status(400).json({
-        error: 'Dados obrigatórios não fornecidos'
-      });
+      return res.status(400).json({ error: 'Dados obrigatórios não fornecidos' });
+    }
+
+    // Erro de violação de UNIQUE (email duplicado)
+    if (error.code === '23505') {
+      return res.status(400).json({ error: 'Email já cadastrado no sistema' });
     }
 
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
-}
+};
 
+// Obter pessoa por ID (sem mostrar senha)
 exports.obterPessoa = async (req, res) => {
   try {
-    const cpf = req.params.id; // Usando id do parâmetro da rota
+    const id = parseInt(req.params.id);
 
-    if (!cpf) {
-      return res.status(400).json({ error: 'CPF é obrigatório' });
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'ID deve ser um número válido' });
     }
 
-    let result;
-    if (global.useMockData) {
-      result = await global.mockDatabase.obterPessoa(cpf);
-    } else {
-      result = await query(
-        'SELECT * FROM pessoa WHERE cpf = $1',
-        [cpf]
-      );
-    }
+    const result = await query(
+      'SELECT id, nome, email FROM pessoa WHERE id = $1',
+      [id]
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Pessoa não encontrada' });
@@ -121,85 +96,99 @@ exports.obterPessoa = async (req, res) => {
     console.error('Erro ao obter pessoa:', error);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
-}
+};
 
+// Atualizar pessoa
 exports.atualizarPessoa = async (req, res) => {
   try {
-    const cpf = req.params.id; // Usando id do parâmetro da rota
-    const { nome_pessoa, email_pessoa, senha_pessoa } = req.body;
+    const id = parseInt(req.params.id);
+    const { nome, email, senha } = req.body;
+
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'ID deve ser um número válido' });
+    }
 
     // Validação de email se fornecido
-    if (email_pessoa) {
+    if (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email_pessoa)) {
-        return res.status(400).json({
-          error: 'Formato de email inválido'
-        });
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Email inválido' });
       }
     }
+
+    // Validação de senha se fornecida
+    if (senha && senha.length < 6) {
+      return res.status(400).json({ error: 'Senha deve ter no mínimo 6 caracteres' });
+    }
+
     // Verifica se a pessoa existe
-    const existingPersonResult = await query(
-      'SELECT * FROM pessoa WHERE cpf = $1',
-      [cpf]
+    const existingPessoa = await query(
+      'SELECT * FROM pessoa WHERE id = $1',
+      [id]
     );
 
-    if (existingPersonResult.rows.length === 0) {
+    if (existingPessoa.rows.length === 0) {
       return res.status(404).json({ error: 'Pessoa não encontrada' });
     }
 
-    // Constrói a query de atualização dinamicamente para campos não nulos
-    const currentPerson = existingPersonResult.rows[0];
+    const currentPessoa = existingPessoa.rows[0];
     const updatedFields = {
-      nome_pessoa: nome_pessoa !== undefined ? nome_pessoa : currentPerson.nome_pessoa,
-      email_pessoa: email_pessoa !== undefined ? email_pessoa : currentPerson.email_pessoa,
-      senha_pessoa: senha_pessoa !== undefined ? senha_pessoa : currentPerson.senha_pessoa,
+      nome: nome !== undefined ? nome : currentPessoa.nome,
+      email: email !== undefined ? email.toLowerCase() : currentPessoa.email,
+      senha: currentPessoa.senha
     };
 
-    // Atualiza a pessoa
+    // Criptografar nova senha se fornecida
+    if (senha) {
+      const saltRounds = 10;
+      updatedFields.senha = await bcrypt.hash(senha, saltRounds);
+    }
+
     const updateResult = await query(
-      'UPDATE pessoa SET nome_pessoa = $1, email_pessoa = $2, senha_pessoa = $3 WHERE cpf = $4 RETURNING *',
-      [updatedFields.nome_pessoa, updatedFields.email_pessoa, updatedFields.senha_pessoa, cpf]
+      'UPDATE pessoa SET nome = $1, email = $2, senha = $3 WHERE id = $4 RETURNING id, nome, email',
+      [updatedFields.nome, updatedFields.email, updatedFields.senha, id]
     );
 
     res.json(updateResult.rows[0]);
   } catch (error) {
     console.error('Erro ao atualizar pessoa:', error);
 
-    // Verifica se é erro de email duplicado
-    if (error.code === '23505' && error.constraint === 'pessoa_email_pessoa_key') {
-      return res.status(400).json({
-        error: 'Email já está em uso por outra pessoa'
-      });
+    // Erro de violação de UNIQUE (email duplicado)
+    if (error.code === '23505') {
+      return res.status(400).json({ error: 'Email já cadastrado no sistema' });
     }
 
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
-}
+};
 
+// Deletar pessoa
 exports.deletarPessoa = async (req, res) => {
   try {
-    const cpf = req.params.id; // Usando id do parâmetro da rota
+    const id = parseInt(req.params.id);
+
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'ID deve ser um número válido' });
+    }
+
     // Verifica se a pessoa existe
-    const existingPersonResult = await query(
-      'SELECT * FROM pessoa WHERE cpf = $1',
-      [cpf]
+    const existingPessoa = await query(
+      'SELECT * FROM pessoa WHERE id = $1',
+      [id]
     );
 
-    if (existingPersonResult.rows.length === 0) {
+    if (existingPessoa.rows.length === 0) {
       return res.status(404).json({ error: 'Pessoa não encontrada' });
     }
 
-    // Deleta a pessoa (as constraints CASCADE cuidarão das dependências)
-    await query(
-      'DELETE FROM pessoa WHERE cpf = $1',
-      [cpf]
-    );
+    // Deleta a pessoa
+    await query('DELETE FROM pessoa WHERE id = $1', [id]);
 
     res.status(204).send();
   } catch (error) {
     console.error('Erro ao deletar pessoa:', error);
 
-    // Verifica se é erro de violação de foreign key (dependências)
+    // Erro de violação de foreign key
     if (error.code === '23503') {
       return res.status(400).json({
         error: 'Não é possível deletar pessoa com dependências associadas'
@@ -208,75 +197,4 @@ exports.deletarPessoa = async (req, res) => {
 
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
-}
-
-// Função adicional para buscar pessoa por email
-exports.obterPessoaPorEmail = async (req, res) => {
-  try {
-    const { email } = req.params;
-
-    if (!email) {
-      return res.status(400).json({ error: 'Email é obrigatório' });
-    }
-
-    const result = await query(
-      'SELECT * FROM pessoa WHERE email_pessoa = $1',
-      [email]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Pessoa não encontrada' });
-    }
-
-    res.json(result.rows[0]);
-  } catch (error) {
-    console.error('Erro ao obter pessoa por email:', error);
-    res.status(500).json({ error: 'Erro interno do servidor' });
-  }
-}
-
-// Função para atualizar apenas a senha
-exports.atualizarSenha = async (req, res) => {
-  try {
-    const cpf = req.params.id; // Usando id do parâmetro da rota
-    const { senha_atual, nova_senha } = req.body;
-
-    if (!cpf) {
-      return res.status(400).json({ error: 'CPF é obrigatório' });
-    }
-
-    if (!senha_atual || !nova_senha) {
-      return res.status(400).json({
-        error: 'Senha atual e nova senha são obrigatórias'
-      });
-    }
-
-    // Verifica se a pessoa existe e a senha atual está correta
-    const personResult = await query(
-      'SELECT * FROM pessoa WHERE cpf = $1',
-      [cpf]
-    );
-
-    if (personResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Pessoa não encontrada' });
-    }
-
-    const person = personResult.rows[0];
-
-    // Verificação básica da senha atual (em produção, use hash)
-    if (person.senha_pessoa !== senha_atual) {
-      return res.status(400).json({ error: 'Senha atual incorreta' });
-    }
-
-    // Atualiza apenas a senha
-    const updateResult = await query(
-      'UPDATE pessoa SET senha_pessoa = $1 WHERE cpf = $2 RETURNING cpf, nome_pessoa, email_pessoa',
-      [nova_senha, cpf]
-    );
-
-    res.json(updateResult.rows[0]);
-  } catch (error) {
-    console.error('Erro ao atualizar senha:', error);
-    res.status(500).json({ error: 'Erro interno do servidor' });
-  }
-}
+};

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD - Equipes</title>
+    <link rel="stylesheet" href="/equipe/equipe.css">
+</head>
+
+<body>
+    <header>
+        <h1>🏆 Gerenciamento de Equipes</h1>
+    </header>
+
+    <main>
+        <section class="form-section">
+            <h2>Cadastro de Equipe</h2>
+
+            <form id="equipeForm">
+                <div class="search-container">
+                    <label for="searchId">Buscar por ID:</label>
+                    <div class="search-input-group">
+                        <input type="text" id="searchId" placeholder="Ex: 1A, 2B, 3C" maxlength="20" 
+                               pattern="[0-9]+[A-Z]" title="Formato: número + letra maiúscula (Ex: 1A)">
+                        <button type="button" id="btnBuscar" class="btn-secondary">🔍 Buscar</button>
+                        <button type="button" id="btnIncluir" class="btn-primary">✚ Incluir</button>
+                        <button type="button" id="btnAlterar" class="btn-secondary" style="display: none;">✎ Alterar</button>
+                        <button type="button" id="btnExcluir" class="btn-danger" style="display: none;">🗑 Excluir</button>
+                        <button type="button" id="btnSalvar" class="btn-save" style="display: none;">💾 Salvar</button>
+                        <button type="button" id="btnCancelar" class="btn-cancel">✖ Cancelar</button>
+                    </div>
+                </div>
+
+                <fieldset id="formFields">
+                    <legend>Dados da Equipe</legend>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nome_lider">Nome do Líder: <span class="required">*</span></label>
+                            <input type="text" id="nome_lider" name="nome_lider" required maxlength="100" 
+                                   placeholder="Ex: João Silva">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nome_vice">Nome do Vice: <span class="required">*</span></label>
+                            <input type="text" id="nome_vice" name="nome_vice" required maxlength="100" 
+                                   placeholder="Ex: Maria Santos">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cor">Cor da Equipe: <span class="required">*</span></label>
+                            <div class="color-input-group">
+                                <input type="color" id="cor" name="cor" required title="Selecione a cor da equipe">
+                                <input type="text" id="cor_text" placeholder="#000000" maxlength="7" readonly 
+                                       title="Código hexadecimal da cor">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="quantidade_alunos">Quantidade de Alunos: <span class="required">*</span></label>
+                            <input type="number" id="quantidade_alunos" name="quantidade_alunos" required min="1" 
+                                   placeholder="Ex: 25">
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>ℹ️ Formato do ID:</strong> Use número seguido de letra maiúscula. Exemplos: <code>1A</code>, <code>2B</code>, <code>3C</code>, <code>10A</code>
+                    </div>
+                </fieldset>
+            </form>
+        </section>
+
+        <section class="list-section">
+            <h2>Lista de Equipes Cadastradas</h2>
+            <div class="table-container">
+                <table id="equipesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Líder</th>
+                            <th>Vice</th>
+                            <th>Cor</th>
+                            <th>Quantidade Alunos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="equipesTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center;">Carregando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Sistema de Gerenciamento de Equipes</p>
+    </footer>
+
+    <div id="messageContainer" class="message-container"></div>
+
+    <script>
+        // Script inline para sincronizar o color picker com o input de texto
+        const colorPicker = document.getElementById('cor');
+        const colorText = document.getElementById('cor_text');
+
+        colorPicker.addEventListener('input', function() {
+            colorText.value = this.value.toUpperCase();
+        });
+
+        // Definir cor inicial
+        colorPicker.value = '#3498db';
+        colorText.value = '#3498DB';
+    </script>
+
+    <script src="/equipe/equipe.js"></script>
+
+</body>
+
+</html>

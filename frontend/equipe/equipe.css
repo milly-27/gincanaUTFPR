@@ -114,7 +114,6 @@ fieldset legend {
 .form-group {
     display: flex;
     flex-direction: column;
-    margin-bottom: 1.5rem;
 }
 
 .form-group label {
@@ -129,7 +128,8 @@ fieldset legend {
     font-weight: bold;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
     width: 100%;
     padding: 0.875rem;
     border: 2px solid #cbd5e0;
@@ -139,45 +139,47 @@ fieldset legend {
     background: white;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
     background: #f7fafc;
 }
 
-.form-group input:disabled {
+.form-group input:disabled,
+.form-group select:disabled {
     background-color: #edf2f7;
     cursor: not-allowed;
     opacity: 0.7;
 }
 
-/* Password input group */
-.password-input-group {
+/* Color input group */
+.color-input-group {
     display: flex;
-    gap: 0.5rem;
+    gap: 1rem;
     align-items: center;
 }
 
-.password-input-group input {
-    flex: 1;
-}
-
-.toggle-password {
-    padding: 0.5rem 0.75rem;
-    border: 2px solid #cbd5e0;
-    background: white;
+.color-input-group input[type="color"] {
+    width: 80px;
+    height: 50px;
     border-radius: 8px;
+    border: 2px solid #cbd5e0;
     cursor: pointer;
-    font-size: 1.2rem;
-    transition: all 0.3s ease;
-    min-width: auto;
+    padding: 0.25rem;
 }
 
-.toggle-password:hover {
-    background: #edf2f7;
+.color-input-group input[type="color"]:hover {
     border-color: #667eea;
-    transform: scale(1.1);
+    transform: scale(1.05);
+}
+
+.color-input-group input[type="text"] {
+    flex: 1;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
 /* Info box */
@@ -197,13 +199,14 @@ fieldset legend {
     color: #1a202c;
 }
 
-.info-box ul {
-    margin-left: 1.5rem;
-    margin-top: 0.5rem;
-}
-
-.info-box li {
-    margin-bottom: 0.3rem;
+.info-box code {
+    background: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #667eea;
+    border: 1px solid #cbd5e0;
 }
 
 /* Button styles */
@@ -293,6 +296,7 @@ button:disabled {
     min-width: auto;
     border-radius: 6px;
     border: 2px solid #cbd5e0;
+    font-family: 'Courier New', monospace;
 }
 
 .btn-id:hover {
@@ -300,6 +304,18 @@ button:disabled {
     color: white;
     transform: scale(1.05);
     border-color: #667eea;
+}
+
+/* Color badge */
+.color-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: center;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Table styles */
@@ -449,6 +465,16 @@ footer {
 
     .form-row {
         grid-template-columns: 1fr;
+    }
+
+    .color-input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .color-input-group input[type="color"] {
+        width: 100%;
+        height: 60px;
     }
 
     button {

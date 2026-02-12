@@ -10,7 +10,7 @@
 
 <body>
     <header>
-        <h1>CRUD Cargo</h1>
+        <h1>Gerenciamento de Cargos</h1>
     </header>
 
     <main>
@@ -21,40 +21,41 @@
                 <div class="search-container">
                     <label for="searchId">Buscar por ID:</label>
                     <div class="search-input-group">
-                        <input type="number" id="searchId" placeholder="Digite o ID para buscar">
-                        <button type="button" id="btnBuscar">🔍 Buscar</button>
-
-                        <button type="button" id="btnIncluir" class="btn-primary">Incluir</button>
-                        <button type="button" id="btnAlterar" class="btn-secondary"
-                            style="display: none;">Alterar</button>
-                        <button type="button" id="btnExcluir" class="btn-danger" style="display: none;">Excluir</button>
-                        <button type="button" id="btnSalvar" class="btn-save" style="display: none;">Salvar</button>
-                        <button type="button" id="btnCancelar" class="btn-cancel">Cancelar</button>
+                        <input type="number" id="searchId" placeholder="Digite o ID para buscar" min="1">
+                        <button type="button" id="btnBuscar" class="btn-secondary">🔍 Buscar</button>
+                        <button type="button" id="btnIncluir" class="btn-primary">✚ Incluir</button>
+                        <button type="button" id="btnAlterar" class="btn-secondary" style="display: none;">✎ Alterar</button>
+                        <button type="button" id="btnExcluir" class="btn-danger" style="display: none;">🗑 Excluir</button>
+                        <button type="button" id="btnSalvar" class="btn-save" style="display: none;">💾 Salvar</button>
+                        <button type="button" id="btnCancelar" class="btn-cancel">✖ Cancelar</button>
                     </div>
                 </div>
 
                 <fieldset id="formFields">
-                    <legend>Dados da Cargo</legend>
+                    <legend>Dados do Cargo</legend>
 
                     <div class="form-group">
-                        <label for="nome_cargo">Texto:</label>
-                        <input type="text" id="nome_cargo" name="nome_cargo" required>
+                        <label for="nome_cargo">Nome do Cargo: <span class="required">*</span></label>
+                        <input type="text" id="nome_cargo" name="nome_cargo" required maxlength="100" placeholder="Ex: Gerente, Analista, Desenvolvedor">
                     </div>
                 </fieldset>
             </form>
         </section>
 
         <section class="list-section">
+            <h2>Lista de Cargos Cadastrados</h2>
             <div class="table-container">
                 <table id="cargosTable">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Nome</th>                      
+                            <th>Nome do Cargo</th>
                         </tr>
                     </thead>
                     <tbody id="cargosTableBody">
-                        <!-- Dados serão carregados dinamicamente -->
+                        <tr>
+                            <td colspan="2" style="text-align: center;">Carregando...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -62,12 +63,12 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 CRUD Cargo</p>
+        <p>&copy; 2025 Sistema de Gerenciamento de Cargos</p>
     </footer>
 
     <div id="messageContainer" class="message-container"></div>
 
-    <script src="/cargo/cargo.js" defer></script>
+    <script src="/cargo/cargo.js"></script>
 
 </body>
 
