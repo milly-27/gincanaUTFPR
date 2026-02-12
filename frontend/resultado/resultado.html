@@ -4,20 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRUD - Produto</title>
-    <link rel="stylesheet" href="/produto/produto.css">
+    <title>CRUD - Resultado</title>
+    <link rel="stylesheet" href="/resultado/resultado.css">
 </head>
 
 <body>
     <header>
-        <h1>Gerenciamento de Produtos</h1>
+        <h1>Gerenciamento de Resultados</h1>
     </header>
 
     <main>
         <section class="form-section">
-            <h2>Cadastro de Produto</h2>
+            <h2>Cadastro de Resultado</h2>
 
-            <form id="produtoForm">
+            <form id="resultadoForm">
                 <div class="search-container">
                     <label for="searchId">Buscar por ID:</label>
                     <div class="search-input-group">
@@ -32,16 +32,30 @@
                 </div>
 
                 <fieldset id="formFields">
-                    <legend>Dados do Produto</legend>
+                    <legend>Dados do Resultado</legend>
 
                     <div class="form-group">
-                        <label for="descricao">Descrição: <span class="required">*</span></label>
-                        <input type="text" id="descricao" name="descricao" required maxlength="150" placeholder="Ex: Café Premium, Chocolate ao Leite">
+                        <label for="prova_id">Prova: <span class="required">*</span></label>
+                        <select id="prova_id" name="prova_id" required>
+                            <option value="">Selecione a prova</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="unidade">Unidade: <span class="required">*</span></label>
-                        <input type="text" id="unidade" name="unidade" required maxlength="100" placeholder="Ex: kg, litro, unidade, caixa">
+                        <label for="equipe_id">Equipe: <span class="required">*</span></label>
+                        <select id="equipe_id" name="equipe_id" required>
+                            <option value="">Selecione a equipe</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="colocacao">Colocação:</label>
+                        <select id="colocacao" name="colocacao">
+                            <option value="">Sem colocação</option>
+                            <option value="1">1º Lugar</option>
+                            <option value="2">2º Lugar</option>
+                            <option value="3">3º Lugar</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -53,20 +67,21 @@
         </section>
 
         <section class="list-section">
-            <h2>Lista de Produtos Cadastrados</h2>
+            <h2>Lista de Resultados Cadastrados</h2>
             <div class="table-container">
-                <table id="produtosTable">
+                <table id="resultadosTable">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Descrição</th>
-                            <th>Unidade</th>
+                            <th>Prova</th>
+                            <th>Equipe</th>
+                            <th>Colocação</th>
                             <th>Pontos</th>
                         </tr>
                     </thead>
-                    <tbody id="produtosTableBody">
+                    <tbody id="resultadosTableBody">
                         <tr>
-                            <td colspan="4" style="text-align: center;">Carregando...</td>
+                            <td colspan="5" style="text-align: center;">Carregando...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -75,12 +90,12 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 Sistema de Gerenciamento de Produtos</p>
+        <p>&copy; 2025 Sistema de Gerenciamento de Resultados</p>
     </footer>
 
     <div id="messageContainer" class="message-container"></div>
 
-    <script src="/produto/produto.js"></script>
+    <script src="/resultado/resultado.js"></script>
 
 </body>
 

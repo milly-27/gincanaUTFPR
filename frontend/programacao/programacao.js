@@ -1,10 +1,10 @@
 // Configuração da API
 const API_BASE_URL = 'http://localhost:3001';
-let currentProdutoId = null;
+let currentProgramacaoId = null;
 let operacao = null;
 
 // Elementos do DOM
-const form = document.getElementById('produtoForm');
+const form = document.getElementById('programacaoForm');
 const searchId = document.getElementById('searchId');
 const btnBuscar = document.getElementById('btnBuscar');
 const btnIncluir = document.getElementById('btnIncluir');
@@ -12,20 +12,20 @@ const btnAlterar = document.getElementById('btnAlterar');
 const btnExcluir = document.getElementById('btnExcluir');
 const btnCancelar = document.getElementById('btnCancelar');
 const btnSalvar = document.getElementById('btnSalvar');
-const produtosTableBody = document.getElementById('produtosTableBody');
+const programacoesTableBody = document.getElementById('programacoesTableBody');
 const messageContainer = document.getElementById('messageContainer');
 
-// Carregar lista de produtos ao inicializar
+// Carregar lista de programações ao inicializar
 document.addEventListener('DOMContentLoaded', () => {
-    carregarProdutos();
+    carregarProgramacoes();
     inicializarEstado();
 });
 
 // Event Listeners
-btnBuscar.addEventListener('click', buscarProduto);
-btnIncluir.addEventListener('click', incluirProduto);
-btnAlterar.addEventListener('click', alterarProduto);
-btnExcluir.addEventListener('click', excluirProduto);
+btnBuscar.addEventListener('click', buscarProgramacao);
+btnIncluir.addEventListener('click', incluirProgramacao);
+btnAlterar.addEventListener('click', alterarProgramacao);
+btnExcluir.addEventListener('click', excluirProgramacao);
 btnCancelar.addEventListener('click', cancelarOperacao);
 btnSalvar.addEventListener('click', salvarOperacao);
 
@@ -46,7 +46,7 @@ function mostrarMensagem(texto, tipo = 'info') {
 
 // Função para bloquear/desbloquear campos
 function bloquearCampos(bloquearPrimeiro) {
-    const inputs = form.querySelectorAll('input:not(#searchId), select');
+    const inputs = form.querySelectorAll('input:not(#searchId), select, textarea');
     searchId.disabled = bloquearPrimeiro;
     
     inputs.forEach((input) => {
@@ -57,7 +57,7 @@ function bloquearCampos(bloquearPrimeiro) {
 // Função para limpar formulário
 function limparFormulario() {
     form.reset();
-    currentProdutoId = null;
+    currentProgramacaoId = null;
 }
 
 // Função para mostrar/ocultar botões
@@ -70,8 +70,8 @@ function mostrarBotoes(btBuscar, btIncluir, btAlterar, btExcluir, btSalvar, btCa
     btnCancelar.style.display = btCancelar ? 'inline-block' : 'none';
 }
 
-// Função para buscar produto por ID
-async function buscarProduto() {
+// Função para buscar programação por ID
+async function buscarProgramacao() {
     const id = searchId.value.trim();
     
     if (!id) {
@@ -80,69 +80,68 @@ async function buscarProduto() {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/produtos/${id}`);
+        const response = await fetch(`${API_BASE_URL}/programacoes/${id}`);
 
         if (response.ok) {
-            const produto = await response.json();
-            preencherFormulario(produto);
+            const programacao = await response.json();
+            preencherFormulario(programacao);
             mostrarBotoes(true, false, true, true, false, false);
             bloquearCampos(false);
-            mostrarMensagem('Produto encontrado!', 'success');
+            mostrarMensagem('Programação encontrada!', 'success');
         } else if (response.status === 404) {
             limparFormulario();
             searchId.value = id;
             mostrarBotoes(true, true, false, false, false, false);
             bloquearCampos(false);
-            mostrarMensagem('Produto não encontrado. Você pode incluir um novo produto.', 'info');
+            mostrarMensagem('Programação não encontrada. Você pode incluir uma nova programação.', 'info');
         } else {
-            throw new Error('Erro ao buscar produto');
+            throw new Error('Erro ao buscar programação');
         }
     } catch (error) {
         console.error('Erro:', error);
-        mostrarMensagem('Erro ao buscar produto', 'error');
+        mostrarMensagem('Erro ao buscar programação', 'error');
     }
 }
 
 // Função para preencher formulário
-function preencherFormulario(produto) {
-    currentProdutoId = produto.id;
-    searchId.value = produto.id;
-    document.getElementById('descricao').value = produto.descricao || '';
-    document.getElementById('unidade').value = produto.unidade || '';
-    document.getElementById('pontos').value = produto.pontos || '';
+function preencherFormulario(programacao) {
+    currentProgramacaoId = programacao.id;
+    searchId.value = programacao.id;
+    document.getElementById('dia').value = programacao.dia || '';
+    document.getElementById('descricao').value = programacao.descricao || '';
 }
 
-// Função para incluir produto
-function incluirProduto() {
-    currentProdutoId = searchId.value.trim();
+// Função para incluir programação
+function incluirProgramacao() {
+    currentProgramacaoId = searchId.value.trim();
     limparFormulario();
-    searchId.value = currentProdutoId;
+    searchId.value = currentProgramacaoId;
     
     bloquearCampos(true);
     mostrarBotoes(false, false, false, false, true, true);
-    document.getElementById('descricao').focus();
+    document.getElementById('dia').focus();
     operacao = 'incluir';
     
-    mostrarMensagem('Digite os dados do novo produto', 'info');
+    mostrarMensagem('Digite os dados da nova programação', 'info');
 }
 
-// Função para alterar produto
-function alterarProduto() {
+// Função para alterar programação
+function alterarProgramacao() {
     bloquearCampos(true);
     mostrarBotoes(false, false, false, false, true, true);
-    document.getElementById('descricao').focus();
+    document.getElementById('dia').focus();
     operacao = 'alterar';
     
     mostrarMensagem('Altere os dados desejados', 'info');
 }
 
-// Função para excluir produto
-function excluirProduto() {
-    if (!confirm('Tem certeza que deseja excluir este produto?')) {
+// Função para excluir programação
+function excluirProgramacao() {
+    if (!confirm('Tem certeza que deseja excluir esta programação?')) {
         return;
     }
     
-    currentProdutoId = searchId.value;
+    currentProgramacaoId = searchId.value;
     searchId.disabled = true;
     bloquearCampos(false);
     mostrarBotoes(false, false, false, false, true, true);
@@ -154,25 +153,20 @@ function excluirProduto() {
 // Função para salvar operação
 async function salvarOperacao() {
     const formData = new FormData(form);
-    const produto = {
+    const programacao = {
         id: searchId.value.trim(),
-        descricao: formData.get('descricao'),
-        unidade: formData.get('unidade'),
-        pontos: formData.get('pontos')
+        dia: formData.get('dia'),
+        descricao: formData.get('descricao')
     };
 
     // Validação
     if (operacao !== 'excluir') {
-        if (!produto.descricao) {
+        if (!programacao.dia) {
+            mostrarMensagem('Dia da semana é obrigatório', 'error');
+            return;
+        }
+        if (!programacao.descricao) {
             mostrarMensagem('Descrição é obrigatória', 'error');
-            return;
-        }
-        if (!produto.unidade) {
-            mostrarMensagem('Unidade é obrigatória', 'error');
-            return;
-        }
-        if (!produto.pontos) {
-            mostrarMensagem('Pontos são obrigatórios', 'error');
             return;
         }
     }
@@ -181,31 +175,31 @@ async function salvarOperacao() {
         let response;
 
         if (operacao === 'incluir') {
-            response = await fetch(`${API_BASE_URL}/produtos`, {
+            response = await fetch(`${API_BASE_URL}/programacoes`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(produto)
+                body: JSON.stringify(programacao)
             });
         } else if (operacao === 'alterar') {
-            response = await fetch(`${API_BASE_URL}/produtos/${currentProdutoId}`, {
+            response = await fetch(`${API_BASE_URL}/programacoes/${currentProgramacaoId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(produto)
+                body: JSON.stringify(programacao)
             });
         } else if (operacao === 'excluir') {
-            response = await fetch(`${API_BASE_URL}/produtos/${currentProdutoId}`, {
+            response = await fetch(`${API_BASE_URL}/programacoes/${currentProgramacaoId}`, {
                 method: 'DELETE'
             });
         }
 
         if (response.ok) {
-            mostrarMensagem(`Produto ${operacao === 'incluir' ? 'incluído' : operacao === 'alterar' ? 'alterado' : 'excluído'} com sucesso!`, 'success');
+            mostrarMensagem(`Programação ${operacao === 'incluir' ? 'incluída' : operacao === 'alterar' ? 'alterada' : 'excluída'} com sucesso!`, 'success');
             limparFormulario();
-            carregarProdutos();
+            carregarProgramacoes();
             inicializarEstado();
         } else {
             const error = await response.json();
@@ -224,50 +218,49 @@ function cancelarOperacao() {
     mostrarMensagem('Operação cancelada', 'info');
 }
 
-// Função para carregar lista de produtos
-async function carregarProdutos() {
+// Função para carregar lista de programações
+async function carregarProgramacoes() {
     try {
-        const response = await fetch(`${API_BASE_URL}/produtos`);
+        const response = await fetch(`${API_BASE_URL}/programacoes`);
         
         if (response.ok) {
-            const produtos = await response.json();
-            renderizarTabelaProdutos(produtos);
+            const programacoes = await response.json();
+            renderizarTabelaProgramacoes(programacoes);
         } else {
-            throw new Error('Erro ao carregar produtos');
+            throw new Error('Erro ao carregar programações');
         }
     } catch (error) {
         console.error('Erro:', error);
-        mostrarMensagem('Erro ao carregar lista de produtos', 'error');
+        mostrarMensagem('Erro ao carregar lista de programações', 'error');
     }
 }
 
-// Função para renderizar tabela de produtos
-function renderizarTabelaProdutos(produtos) {
-    produtosTableBody.innerHTML = '';
+// Função para renderizar tabela de programações
+function renderizarTabelaProgramacoes(programacoes) {
+    programacoesTableBody.innerHTML = '';
 
-    if (produtos.length === 0) {
-        produtosTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum produto cadastrado</td></tr>';
+    if (programacoes.length === 0) {
+        programacoesTableBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Nenhuma programação cadastrada</td></tr>';
         return;
     }
 
-    produtos.forEach(produto => {
+    programacoes.forEach(programacao => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
-                <button class="btn-id" onclick="selecionarProduto(${produto.id})">
-                    ${produto.id}
+                <button class="btn-id" onclick="selecionarProgramacao(${programacao.id})">
+                    ${programacao.id}
                 </button>
             </td>
-            <td>${produto.descricao}</td>
-            <td>${produto.unidade}</td>
-            <td>${produto.pontos}</td>
+            <td>${programacao.dia}</td>
+            <td class="descricao-cell">${programacao.descricao}</td>
         `;
-        produtosTableBody.appendChild(row);
+        programacoesTableBody.appendChild(row);
     });
 }
 
-// Função para selecionar produto da tabela
-async function selecionarProduto(id) {
+// Função para selecionar programação da tabela
+async function selecionarProgramacao(id) {
     searchId.value = id;
-    await buscarProduto();
+    await buscarProgramacao();
 }

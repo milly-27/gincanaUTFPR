@@ -1,10 +1,10 @@
 // Configuração da API
 const API_BASE_URL = 'http://localhost:3001';
-let currentProdutoId = null;
+let currentProvaId = null;
 let operacao = null;
 
 // Elementos do DOM
-const form = document.getElementById('produtoForm');
+const form = document.getElementById('provaForm');
 const searchId = document.getElementById('searchId');
 const btnBuscar = document.getElementById('btnBuscar');
 const btnIncluir = document.getElementById('btnIncluir');
@@ -12,20 +12,20 @@ const btnAlterar = document.getElementById('btnAlterar');
 const btnExcluir = document.getElementById('btnExcluir');
 const btnCancelar = document.getElementById('btnCancelar');
 const btnSalvar = document.getElementById('btnSalvar');
-const produtosTableBody = document.getElementById('produtosTableBody');
+const provasTableBody = document.getElementById('provasTableBody');
 const messageContainer = document.getElementById('messageContainer');
 
-// Carregar lista de produtos ao inicializar
+// Carregar lista de provas ao inicializar
 document.addEventListener('DOMContentLoaded', () => {
-    carregarProdutos();
+    carregarProvas();
     inicializarEstado();
 });
 
 // Event Listeners
-btnBuscar.addEventListener('click', buscarProduto);
-btnIncluir.addEventListener('click', incluirProduto);
-btnAlterar.addEventListener('click', alterarProduto);
-btnExcluir.addEventListener('click', excluirProduto);
+btnBuscar.addEventListener('click', buscarProva);
+btnIncluir.addEventListener('click', incluirProva);
+btnAlterar.addEventListener('click', alterarProva);
+btnExcluir.addEventListener('click', excluirProva);
 btnCancelar.addEventListener('click', cancelarOperacao);
 btnSalvar.addEventListener('click', salvarOperacao);
 
@@ -57,7 +57,7 @@ function bloquearCampos(bloquearPrimeiro) {
 // Função para limpar formulário
 function limparFormulario() {
     form.reset();
-    currentProdutoId = null;
+    currentProvaId = null;
 }
 
 // Função para mostrar/ocultar botões
@@ -70,8 +70,8 @@ function mostrarBotoes(btBuscar, btIncluir, btAlterar, btExcluir, btSalvar, btCa
     btnCancelar.style.display = btCancelar ? 'inline-block' : 'none';
 }
 
-// Função para buscar produto por ID
-async function buscarProduto() {
+// Função para buscar prova por ID
+async function buscarProva() {
     const id = searchId.value.trim();
     
     if (!id) {
@@ -80,69 +80,69 @@ async function buscarProduto() {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/produtos/${id}`);
+        const response = await fetch(`${API_BASE_URL}/provas/${id}`);
 
         if (response.ok) {
-            const produto = await response.json();
-            preencherFormulario(produto);
+            const prova = await response.json();
+            preencherFormulario(prova);
             mostrarBotoes(true, false, true, true, false, false);
             bloquearCampos(false);
-            mostrarMensagem('Produto encontrado!', 'success');
+            mostrarMensagem('Prova encontrada!', 'success');
         } else if (response.status === 404) {
             limparFormulario();
             searchId.value = id;
             mostrarBotoes(true, true, false, false, false, false);
             bloquearCampos(false);
-            mostrarMensagem('Produto não encontrado. Você pode incluir um novo produto.', 'info');
+            mostrarMensagem('Prova não encontrada. Você pode incluir uma nova prova.', 'info');
         } else {
-            throw new Error('Erro ao buscar produto');
+            throw new Error('Erro ao buscar prova');
         }
     } catch (error) {
         console.error('Erro:', error);
-        mostrarMensagem('Erro ao buscar produto', 'error');
+        mostrarMensagem('Erro ao buscar prova', 'error');
     }
 }
 
 // Função para preencher formulário
-function preencherFormulario(produto) {
-    currentProdutoId = produto.id;
-    searchId.value = produto.id;
-    document.getElementById('descricao').value = produto.descricao || '';
-    document.getElementById('unidade').value = produto.unidade || '';
-    document.getElementById('pontos').value = produto.pontos || '';
+function preencherFormulario(prova) {
+    currentProvaId = prova.id;
+    searchId.value = prova.id;
+    document.getElementById('nome').value = prova.nome || '';
+    document.getElementById('categoria').value = prova.categoria || '';
+    document.getElementById('dia').value = prova.dia || '';
 }
 
-// Função para incluir produto
-function incluirProduto() {
-    currentProdutoId = searchId.value.trim();
+// Função para incluir prova
+function incluirProva() {
+    currentProvaId = searchId.value.trim();
     limparFormulario();
-    searchId.value = currentProdutoId;
+    searchId.value = currentProvaId;
     
     bloquearCampos(true);
     mostrarBotoes(false, false, false, false, true, true);
-    document.getElementById('descricao').focus();
+    document.getElementById('nome').focus();
     operacao = 'incluir';
     
-    mostrarMensagem('Digite os dados do novo produto', 'info');
+    mostrarMensagem('Digite os dados da nova prova', 'info');
 }
 
-// Função para alterar produto
-function alterarProduto() {
+// Função para alterar prova
+function alterarProva() {
     bloquearCampos(true);
     mostrarBotoes(false, false, false, false, true, true);
-    document.getElementById('descricao').focus();
+    document.getElementById('nome').focus();
     operacao = 'alterar';
     
     mostrarMensagem('Altere os dados desejados', 'info');
 }
 
-// Função para excluir produto
-function excluirProduto() {
-    if (!confirm('Tem certeza que deseja excluir este produto?')) {
+// Função para excluir prova
+function excluirProva() {
+    if (!confirm('Tem certeza que deseja excluir esta prova?')) {
         return;
     }
     
-    currentProdutoId = searchId.value;
+    currentProvaId = searchId.value;
     searchId.disabled = true;
     bloquearCampos(false);
     mostrarBotoes(false, false, false, false, true, true);
@@ -154,25 +154,21 @@ function excluirProduto() {
 // Função para salvar operação
 async function salvarOperacao() {
     const formData = new FormData(form);
-    const produto = {
+    const prova = {
         id: searchId.value.trim(),
-        descricao: formData.get('descricao'),
-        unidade: formData.get('unidade'),
-        pontos: formData.get('pontos')
+        nome: formData.get('nome'),
+        categoria: formData.get('categoria'),
+        dia: formData.get('dia')
     };
 
     // Validação
     if (operacao !== 'excluir') {
-        if (!produto.descricao) {
-            mostrarMensagem('Descrição é obrigatória', 'error');
+        if (!prova.nome) {
+            mostrarMensagem('Nome da prova é obrigatório', 'error');
             return;
         }
-        if (!produto.unidade) {
-            mostrarMensagem('Unidade é obrigatória', 'error');
-            return;
-        }
-        if (!produto.pontos) {
-            mostrarMensagem('Pontos são obrigatórios', 'error');
+        if (!prova.dia) {
+            mostrarMensagem('Dia da semana é obrigatório', 'error');
             return;
         }
     }
@@ -181,31 +177,31 @@ async function salvarOperacao() {
         let response;
 
         if (operacao === 'incluir') {
-            response = await fetch(`${API_BASE_URL}/produtos`, {
+            response = await fetch(`${API_BASE_URL}/provas`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(produto)
+                body: JSON.stringify(prova)
             });
         } else if (operacao === 'alterar') {
-            response = await fetch(`${API_BASE_URL}/produtos/${currentProdutoId}`, {
+            response = await fetch(`${API_BASE_URL}/provas/${currentProvaId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(produto)
+                body: JSON.stringify(prova)
             });
         } else if (operacao === 'excluir') {
-            response = await fetch(`${API_BASE_URL}/produtos/${currentProdutoId}`, {
+            response = await fetch(`${API_BASE_URL}/provas/${currentProvaId}`, {
                 method: 'DELETE'
             });
         }
 
         if (response.ok) {
-            mostrarMensagem(`Produto ${operacao === 'incluir' ? 'incluído' : operacao === 'alterar' ? 'alterado' : 'excluído'} com sucesso!`, 'success');
+            mostrarMensagem(`Prova ${operacao === 'incluir' ? 'incluída' : operacao === 'alterar' ? 'alterada' : 'excluída'} com sucesso!`, 'success');
             limparFormulario();
-            carregarProdutos();
+            carregarProvas();
             inicializarEstado();
         } else {
             const error = await response.json();
@@ -224,50 +220,50 @@ function cancelarOperacao() {
     mostrarMensagem('Operação cancelada', 'info');
 }
 
-// Função para carregar lista de produtos
-async function carregarProdutos() {
+// Função para carregar lista de provas
+async function carregarProvas() {
     try {
-        const response = await fetch(`${API_BASE_URL}/produtos`);
+        const response = await fetch(`${API_BASE_URL}/provas`);
         
         if (response.ok) {
-            const produtos = await response.json();
-            renderizarTabelaProdutos(produtos);
+            const provas = await response.json();
+            renderizarTabelaProvas(provas);
         } else {
-            throw new Error('Erro ao carregar produtos');
+            throw new Error('Erro ao carregar provas');
         }
     } catch (error) {
         console.error('Erro:', error);
-        mostrarMensagem('Erro ao carregar lista de produtos', 'error');
+        mostrarMensagem('Erro ao carregar lista de provas', 'error');
     }
 }
 
-// Função para renderizar tabela de produtos
-function renderizarTabelaProdutos(produtos) {
-    produtosTableBody.innerHTML = '';
+// Função para renderizar tabela de provas
+function renderizarTabelaProvas(provas) {
+    provasTableBody.innerHTML = '';
 
-    if (produtos.length === 0) {
-        produtosTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum produto cadastrado</td></tr>';
+    if (provas.length === 0) {
+        provasTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhuma prova cadastrada</td></tr>';
         return;
     }
 
-    produtos.forEach(produto => {
+    provas.forEach(prova => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
-                <button class="btn-id" onclick="selecionarProduto(${produto.id})">
-                    ${produto.id}
+                <button class="btn-id" onclick="selecionarProva(${prova.id})">
+                    ${prova.id}
                 </button>
             </td>
-            <td>${produto.descricao}</td>
-            <td>${produto.unidade}</td>
-            <td>${produto.pontos}</td>
+            <td>${prova.nome}</td>
+            <td>${prova.categoria || '-'}</td>
+            <td>${prova.dia}</td>
         `;
-        produtosTableBody.appendChild(row);
+        provasTableBody.appendChild(row);
     });
 }
 
-// Função para selecionar produto da tabela
-async function selecionarProduto(id) {
+// Função para selecionar prova da tabela
+async function selecionarProva(id) {
     searchId.value = id;
-    await buscarProduto();
+    await buscarProva();
 }
