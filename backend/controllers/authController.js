@@ -1,28 +1,24 @@
 const db = require('../database');
-// No início do arquivo authController.js, adicione esta linha:
-const { enviarEmailRecuperacao } = require('../config/emailConfig');
+
 // ======================================
 // REGISTRO DE NOVO USUÁRIO
 // ======================================
 exports.registro = async (req, res) => {
-  const {
-    name, email, password, cpf, birthdate,
-    cidade, estado, rua, numero, cep, complemento, bairro
-  } = req.body;
+  const { name, email, password, cargo } = req.body;
 
-  console.log('📝 Tentativa de registro:', { email, cpf });
+  console.log('📝 Tentativa de registro:', { email, cargo });
 
   // Validações básicas
   if (!name || !email || !password) {
     return res.status(400).json({ error: 'Nome, e-mail e senha são obrigatórios.' });
   }
 
-  if (!cpf || cpf.length !== 11) {
-    return res.status(400).json({ error: 'CPF deve ter 11 dígitos.' });
-  }
-
   if (password.length > 20) {
     return res.status(400).json({ error: 'Senha deve ter no máximo 20 caracteres.' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Senha deve ter no mínimo 6 caracteres.' });
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,42 +26,48 @@ exports.registro = async (req, res) => {
     return res.status(400).json({ error: 'Formato de email inválido.' });
   }
 
+  // Validar cargo
+  const cargosValidos = ['aluno', 'representante', 'professor'];
+  const cargoFinal = cargo && cargosValidos.includes(cargo.toLowerCase()) ? cargo.toLowerCase() : 'aluno';
+
+  const client = await db.pool.connect();
+  
   try {
-    // Verificar se CPF ou email já existem
-    const checkUser = await db.query(
-      'SELECT cpf, email_pessoa FROM pessoa WHERE cpf = $1 OR email_pessoa = $2',
-      [cpf, email]
+    await client.query('BEGIN');
+
+    // Verificar se email já existe
+    const checkUser = await client.query(
+      'SELECT email FROM pessoa WHERE email = $1',
+      [email]
     );
 
     if (checkUser.rows.length > 0) {
-      if (checkUser.rows[0].cpf === cpf) {
-        return res.status(400).json({ error: 'CPF já cadastrado.' });
-      }
-      if (checkUser.rows[0].email_pessoa === email) {
-        return res.status(400).json({ error: 'E-mail já cadastrado.' });
-      }
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'E-mail já cadastrado.' });
     }
 
     // Inserir pessoa
-    const resultPessoa = await db.query(
-      `INSERT INTO pessoa (cpf, nome_pessoa, email_pessoa, senha_pessoa)
-       VALUES ($1, $2, $3, $4)
-       RETURNING cpf, nome_pessoa, email_pessoa`,
-      [cpf, name, email, password]
+    const resultPessoa = await client.query(
+      `INSERT INTO pessoa (nome, email, senha)
+       VALUES ($1, $2, $3)
+       RETURNING id, nome, email`,
+      [name, email, password]
     );
 
     const user = resultPessoa.rows[0];
 
-    // Inserir cliente
-    await db.query(
-      'INSERT INTO cliente (cpf) VALUES ($1)',
-      [cpf]
+    // Inserir cargo
+    await client.query(
+      'INSERT INTO cargo (pessoa_id, cargo) VALUES ($1, $2)',
+      [user.id, cargoFinal]
     );
 
-    console.log('✅ Usuário registrado:', user.email_pessoa);
+    await client.query('COMMIT');
 
-    // Criar cookie de sessão
-    res.cookie('usuarioLogado', user.nome_pessoa, {
+    console.log('✅ Usuário registrado:', user.email, 'Cargo:', cargoFinal);
+
+    // Criar cookies de sessão
+    res.cookie('usuarioLogado', user.nome, {
       sameSite: 'None',
       secure: true,
       httpOnly: true,
@@ -73,7 +75,15 @@ exports.registro = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000, // 1 dia
     });
 
-    res.cookie('usuarioCpf', user.cpf, {
+    res.cookie('usuarioId', user.id, {
+      sameSite: 'None',
+      secure: true,
+      httpOnly: true,
+      path: '/',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res.cookie('usuarioCargo', cargoFinal, {
       sameSite: 'None',
       secure: true,
       httpOnly: true,
@@ -84,16 +94,20 @@ exports.registro = async (req, res) => {
     res.json({
       message: 'Usuário registrado com sucesso.',
       user: {
-        cpf: user.cpf,
-        nome: user.nome_pessoa,
-        email: user.email_pessoa
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        cargo: cargoFinal
       },
       logged: true
     });
 
   } catch (err) {
+    await client.query('ROLLBACK');
     console.error('❌ Erro no registro:', err);
     res.status(500).json({ error: 'Erro ao registrar usuário.' });
+  } finally {
+    client.release();
   }
 };
 
@@ -110,14 +124,12 @@ exports.login = async (req, res) => {
   }
 
   try {
-    // Buscar pessoa e verificar se é funcionário
+    // Buscar pessoa e seu cargo
     const resultPessoa = await db.query(
-      `SELECT p.cpf, p.nome_pessoa, p.email_pessoa, p.senha_pessoa,
-              f.cpf as is_funcionario, c.nome_cargo
+      `SELECT p.id, p.nome, p.email, p.senha, c.cargo
        FROM pessoa p
-       LEFT JOIN funcionario f ON p.cpf = f.cpf
-       LEFT JOIN cargo c ON f.id_cargo = c.id_cargo
-       WHERE p.email_pessoa = $1`,
+       LEFT JOIN cargo c ON p.id = c.pessoa_id
+       WHERE p.email = $1`,
       [email_usuario]
     );
 
@@ -127,15 +139,15 @@ exports.login = async (req, res) => {
 
     const user = resultPessoa.rows[0];
 
-    // Verificar senha (texto plano - não recomendado em produção)
-    if (user.senha_pessoa !== senha_usuario) {
+    // Verificar senha (texto plano - em produção use bcrypt)
+    if (user.senha !== senha_usuario) {
       return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
     }
 
-    console.log('✅ Login bem-sucedido:', user.email_pessoa);
+    console.log('✅ Login bem-sucedido:', user.email, 'Cargo:', user.cargo || 'aluno');
 
     // Criar cookies
-    res.cookie('usuarioLogado', user.nome_pessoa, {
+    res.cookie('usuarioLogado', user.nome, {
       sameSite: 'None',
       secure: true,
       httpOnly: true,
@@ -143,7 +155,15 @@ exports.login = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    res.cookie('usuarioCpf', user.cpf, {
+    res.cookie('usuarioId', user.id, {
+      sameSite: 'None',
+      secure: true,
+      httpOnly: true,
+      path: '/',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res.cookie('usuarioCargo', user.cargo || 'aluno', {
       sameSite: 'None',
       secure: true,
       httpOnly: true,
@@ -154,11 +174,10 @@ exports.login = async (req, res) => {
     res.json({
       message: 'Login efetuado com sucesso.',
       user: {
-        cpf: user.cpf,
-        nome: user.nome_pessoa,
-        email: user.email_pessoa,
-        is_funcionario: !!user.is_funcionario,
-        cargo: user.nome_cargo || null
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        cargo: user.cargo || 'aluno'
       },
       logged: true
     });
@@ -174,24 +193,22 @@ exports.login = async (req, res) => {
 // ======================================
 exports.verificarLogin = async (req, res) => {
   const nome = req.cookies.usuarioLogado;
-  const cpf = req.cookies.usuarioCpf;
+  const id = req.cookies.usuarioId;
 
-  console.log('🔍 Verificando login:', { nome, cpf });
+  console.log('🔍 Verificando login:', { nome, id });
 
-  if (!nome || !cpf) {
+  if (!nome || !id) {
     return res.json({ logged: false });
   }
 
   try {
     // Verificar se o usuário ainda existe no banco
     const result = await db.query(
-      `SELECT p.cpf, p.nome_pessoa, p.email_pessoa,
-              f.cpf as is_funcionario, c.nome_cargo
+      `SELECT p.id, p.nome, p.email, c.cargo
        FROM pessoa p
-       LEFT JOIN funcionario f ON p.cpf = f.cpf
-       LEFT JOIN cargo c ON f.id_cargo = c.id_cargo
-       WHERE p.cpf = $1`,
-      [cpf]
+       LEFT JOIN cargo c ON p.id = c.pessoa_id
+       WHERE p.id = $1`,
+      [id]
     );
 
     if (result.rows.length === 0) {
@@ -202,7 +219,13 @@ exports.verificarLogin = async (req, res) => {
         httpOnly: true,
         path: '/',
       });
-      res.clearCookie('usuarioCpf', {
+      res.clearCookie('usuarioId', {
+        sameSite: 'None',
+        secure: true,
+        httpOnly: true,
+        path: '/',
+      });
+      res.clearCookie('usuarioCargo', {
         sameSite: 'None',
         secure: true,
         httpOnly: true,
@@ -215,11 +238,10 @@ exports.verificarLogin = async (req, res) => {
 
     res.json({
       logged: true,
-      cpf: user.cpf,
-      nome: user.nome_pessoa,
-      email: user.email_pessoa,
-      is_funcionario: !!user.is_funcionario,
-      cargo: user.nome_cargo || null
+      id: user.id,
+      nome: user.nome,
+      email: user.email,
+      cargo: user.cargo || 'aluno'
     });
 
   } catch (err) {
@@ -229,13 +251,12 @@ exports.verificarLogin = async (req, res) => {
 };
 
 // ======================================
-// LOGOUT - VERSÃO ROBUSTA E CORRIGIDA
+// LOGOUT
 // ======================================
 exports.logout = (req, res) => {
   console.log('\n👋 [LOGOUT] Iniciando processo de logout...');
   console.log('════════════════════════════════════════');
   
-  // Configurações comuns dos cookies
   const cookieOptions = {
     sameSite: 'None',
     secure: true,
@@ -243,19 +264,12 @@ exports.logout = (req, res) => {
     path: '/',
   };
   
-  // Lista completa de cookies para limpar
   const cookiesParaLimpar = [
     'usuarioLogado',
-    'usuarioCpf',
-    'token',
-    'userId',
-    'userName',
-    'userEmail',
-    'userType',
-    'userCargo'
+    'usuarioId',
+    'usuarioCargo'
   ];
   
-  // Limpar todos os cookies
   cookiesParaLimpar.forEach(cookieName => {
     res.clearCookie(cookieName, cookieOptions);
     console.log(`   🗑️ Cookie limpo: ${cookieName}`);
@@ -272,43 +286,13 @@ exports.logout = (req, res) => {
 };
 
 // ======================================
-// VERIFICAR EMAIL (para fluxo de login em etapas)
-// ======================================
-exports.verificarEmail = async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ error: 'Email é obrigatório' });
-  }
-
-  try {
-    const result = await db.query(
-      'SELECT nome_pessoa FROM pessoa WHERE email_pessoa = $1',
-      [email]
-    );
-
-    if (result.rows.length > 0) {
-      return res.json({
-        status: 'existe',
-        nome: result.rows[0].nome_pessoa
-      });
-    }
-
-    res.json({ status: 'nao_encontrado' });
-  } catch (err) {
-    console.error('❌ Erro ao verificar email:', err);
-    res.status(500).json({ error: 'Erro ao verificar email.' });
-  }
-};
-
-// ======================================
 // ATUALIZAR SENHA
 // ======================================
 exports.atualizarSenha = async (req, res) => {
-  const cpf = req.cookies.usuarioCpf;
+  const id = req.cookies.usuarioId;
   const { senha_atual, nova_senha } = req.body;
 
-  if (!cpf) {
+  if (!id) {
     return res.status(401).json({ error: 'Usuário não autenticado.' });
   }
 
@@ -320,301 +304,37 @@ exports.atualizarSenha = async (req, res) => {
     return res.status(400).json({ error: 'Nova senha deve ter no máximo 20 caracteres.' });
   }
 
+  if (nova_senha.length < 6) {
+    return res.status(400).json({ error: 'Nova senha deve ter no mínimo 6 caracteres.' });
+  }
+
   try {
     // Verificar senha atual
     const checkPassword = await db.query(
-      'SELECT senha_pessoa FROM pessoa WHERE cpf = $1',
-      [cpf]
+      'SELECT senha FROM pessoa WHERE id = $1',
+      [id]
     );
 
     if (checkPassword.rows.length === 0) {
       return res.status(404).json({ error: 'Usuário não encontrado.' });
     }
 
-    if (checkPassword.rows[0].senha_pessoa !== senha_atual) {
+    if (checkPassword.rows[0].senha !== senha_atual) {
       return res.status(400).json({ error: 'Senha atual incorreta.' });
     }
 
     // Atualizar senha
     await db.query(
-      'UPDATE pessoa SET senha_pessoa = $1 WHERE cpf = $2',
-      [nova_senha, cpf]
+      'UPDATE pessoa SET senha = $1 WHERE id = $2',
+      [nova_senha, id]
     );
 
-    console.log('✅ Senha atualizada para CPF:', cpf);
+    console.log('✅ Senha atualizada para ID:', id);
 
     res.json({ message: 'Senha atualizada com sucesso.' });
 
   } catch (err) {
     console.error('❌ Erro ao atualizar senha:', err);
     res.status(500).json({ error: 'Erro ao atualizar senha.' });
-  }
-};
-// ======================================
-// ADICIONE ESTE CÓDIGO NO FINAL DO SEU authController.js
-// ANTES DO ÚLTIMO }; OU module.exports
-// ======================================
-
-// Armazenamento temporário de códigos (em produção, use Redis ou banco)
-const codigosRecuperacao = new Map();
-
-// Função para gerar código de 6 dígitos
-function gerarCodigo() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-// Substitua a função exports.solicitarRecuperacao por esta versão:
-
-// ======================================
-// SOLICITAR RECUPERAÇÃO DE SENHA - COM EMAIL REAL
-// ======================================
-exports.solicitarRecuperacao = async (req, res) => {
-  const { email } = req.body;
-
-  console.log('\n📧 [RECUPERAÇÃO] Solicitação para:', email);
-
-  if (!email) {
-    return res.status(400).json({ 
-      success: false,
-      error: 'Email é obrigatório' 
-    });
-  }
-
-  try {
-    // Verificar se o email existe no banco
-    const result = await db.query(
-      'SELECT cpf, nome_pessoa, email_pessoa FROM pessoa WHERE email_pessoa = $1',
-      [email]
-    );
-
-    if (result.rows.length === 0) {
-      console.log('❌ Email não encontrado:', email);
-      return res.status(404).json({ 
-        success: false,
-        error: 'Email não cadastrado no sistema' 
-      });
-    }
-
-    const user = result.rows[0];
-
-    // Gerar código de 6 dígitos
-    const codigo = gerarCodigo();
-    
-    // Armazenar código com timestamp (válido por 10 minutos)
-    codigosRecuperacao.set(email, {
-      codigo: codigo,
-      timestamp: Date.now(),
-      tentativas: 0
-    });
-
-    console.log('✅ Código gerado:', codigo);
-    console.log('⏰ Válido por 10 minutos');
-
-    // ═══════════════════════════════════════
-    // ENVIAR EMAIL REAL
-    // ═══════════════════════════════════════
-    console.log('📨 Enviando email para:', email);
-    
-    const emailResult = await enviarEmailRecuperacao(
-      user.email_pessoa,
-      user.nome_pessoa,
-      codigo
-    );
-
-    if (emailResult.success) {
-      console.log('✅ Email enviado com sucesso!');
-      
-      // Agendar remoção do código após 10 minutos
-      setTimeout(() => {
-        if (codigosRecuperacao.has(email)) {
-          codigosRecuperacao.delete(email);
-          console.log('🗑️ Código expirado removido para:', email);
-        }
-      }, 10 * 60 * 1000);
-
-      res.json({
-        success: true,
-        message: 'Código enviado para o email cadastrado'
-      });
-    } else {
-      console.error('❌ Falha ao enviar email:', emailResult.error);
-      
-      // Mesmo que o email falhe, ainda deixar o código disponível para teste
-      console.log('⚠️ MODO FALLBACK - Código disponível no console');
-      console.log('\n═══════════════════════════════════════');
-      console.log('📨 CÓDIGO DE RECUPERAÇÃO (FALLBACK)');
-      console.log('═══════════════════════════════════════');
-      console.log('Para:', user.nome_pessoa, `<${email}>`);
-      console.log('Código:', codigo);
-      console.log('═══════════════════════════════════════\n');
-      
-      res.json({
-        success: true,
-        message: 'Erro ao enviar email, mas o código está disponível. Verifique o console do servidor.',
-        warning: 'Email não enviado - verifique a configuração SMTP'
-      });
-    }
-
-  } catch (err) {
-    console.error('❌ Erro ao solicitar recuperação:', err);
-    res.status(500).json({ 
-      success: false,
-      error: 'Erro ao processar solicitação' 
-    });
-  }
-};
-
-// ======================================
-// VERIFICAR CÓDIGO DE RECUPERAÇÃO
-// ======================================
-exports.verificarCodigo = async (req, res) => {
-  const { email, code } = req.body;
-
-  console.log('\n🔍 [VERIFICAÇÃO] Email:', email, '| Código:', code);
-
-  if (!email || !code) {
-    return res.status(400).json({ 
-      success: false,
-      error: 'Email e código são obrigatórios' 
-    });
-  }
-
-  try {
-    // Verificar se existe código para este email
-    const codigoData = codigosRecuperacao.get(email);
-
-    if (!codigoData) {
-      console.log('❌ Nenhum código encontrado para:', email);
-      return res.status(404).json({ 
-        success: false,
-        error: 'Código não encontrado ou expirado. Solicite um novo código.' 
-      });
-    }
-
-    // Verificar se o código expirou (10 minutos)
-    const tempoDecorrido = Date.now() - codigoData.timestamp;
-    const minutosDecorridos = Math.floor(tempoDecorrido / 60000);
-    
-    if (tempoDecorrido > 10 * 60 * 1000) {
-      codigosRecuperacao.delete(email);
-      console.log('❌ Código expirado para:', email);
-      return res.status(400).json({ 
-        success: false,
-        error: 'Código expirado. Solicite um novo código.' 
-      });
-    }
-
-    console.log(`⏰ Tempo decorrido: ${minutosDecorridos} minuto(s)`);
-
-    // Limitar tentativas
-    if (codigoData.tentativas >= 5) {
-      codigosRecuperacao.delete(email);
-      console.log('❌ Muitas tentativas para:', email);
-      return res.status(429).json({ 
-        success: false,
-        error: 'Muitas tentativas. Solicite um novo código.' 
-      });
-    }
-
-    // Verificar se o código está correto
-    if (codigoData.codigo !== code) {
-      codigoData.tentativas++;
-      const tentativasRestantes = 5 - codigoData.tentativas;
-      console.log(`❌ Código incorreto (Tentativa ${codigoData.tentativas}/5)`);
-      return res.status(400).json({ 
-        success: false,
-        error: `Código incorreto. ${tentativasRestantes} tentativa(s) restante(s).` 
-      });
-    }
-
-    console.log('✅ Código verificado com sucesso!');
-
-    res.json({
-      success: true,
-      message: 'Código verificado com sucesso'
-    });
-
-  } catch (err) {
-    console.error('❌ Erro ao verificar código:', err);
-    res.status(500).json({ 
-      success: false,
-      error: 'Erro ao verificar código' 
-    });
-  }
-};
-
-// ======================================
-// REDEFINIR SENHA
-// ======================================
-exports.redefinirSenha = async (req, res) => {
-  const { email, code, nova_senha } = req.body;
-
-  console.log('\n🔑 [REDEFINIR] Alterando senha para:', email);
-
-  if (!email || !code || !nova_senha) {
-    return res.status(400).json({ 
-      success: false,
-      error: 'Email, código e nova senha são obrigatórios' 
-    });
-  }
-
-  // Validar senha
-  if (nova_senha.length < 6 || nova_senha.length > 20) {
-    return res.status(400).json({ 
-      success: false,
-      error: 'A senha deve ter entre 6 e 20 caracteres' 
-    });
-  }
-
-  try {
-    // Verificar código novamente (segurança)
-    const codigoData = codigosRecuperacao.get(email);
-
-    if (!codigoData || codigoData.codigo !== code) {
-      console.log('❌ Código inválido ao redefinir senha');
-      return res.status(400).json({ 
-        success: false,
-        error: 'Código inválido ou expirado' 
-      });
-    }
-
-    // Verificar se o usuário existe
-    const checkUser = await db.query(
-      'SELECT cpf, nome_pessoa FROM pessoa WHERE email_pessoa = $1',
-      [email]
-    );
-
-    if (checkUser.rows.length === 0) {
-      console.log('❌ Usuário não encontrado');
-      return res.status(404).json({ 
-        success: false,
-        error: 'Usuário não encontrado' 
-      });
-    }
-
-    const user = checkUser.rows[0];
-
-    // Atualizar senha no banco
-    await db.query(
-      'UPDATE pessoa SET senha_pessoa = $1 WHERE email_pessoa = $2',
-      [nova_senha, email]
-    );
-
-    // Remover código usado
-    codigosRecuperacao.delete(email);
-
-    console.log('✅ Senha redefinida com sucesso para:', user.nome_pessoa);
-
-    res.json({
-      success: true,
-      message: 'Senha alterada com sucesso'
-    });
-
-  } catch (err) {
-    console.error('❌ Erro ao redefinir senha:', err);
-    res.status(500).json({ 
-      success: false,
-      error: 'Erro ao redefinir senha' 
-    });
   }
 };

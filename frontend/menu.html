@@ -12,6 +12,7 @@
             <h3 id="menuTitle">🏆 GINCANA 2025</h3>
             <div class="user-section">
                 <button id="btnLogin" class="hidden" onclick="window.location.href='./auth/login.html'">Login</button>
+                <button id="btnCadastro" class="hidden" style="display: none;" onclick="window.location.href='./auth/login.html?tab=cadastro'">Cadastrar</button>
                 <div id="userInfo" class="user-info hidden">
                     <span id="userName"></span>
                     <span class="logout-tooltip">Clique para deslogar</span>
@@ -22,38 +23,39 @@
             <ul class="nav__menu">
                 <li class="nav__menu-item"><a href="#">🏠 Home</a></li>
                 
+                <!-- Menu Cadastros - Visível para PROFESSORES e REPRESENTANTES -->
                 <li class="nav__menu-item" id="menuCadastros" style="display: none;">
                     <a href="#">⚙️ Cadastros</a>
                     <ul class="nav__submenu">
-                        <li class="nav__submenu-item"><a href="http://localhost:3001/pessoas/abrirCrudPessoa">👥 Pessoa</a></li>
-                        <li class="nav__submenu-item"><a href="http://localhost:3001/cargos/abrirCrudCargo">💼 Cargo</a></li>
-                        <li class="nav__submenu-item"><a href="http://localhost:3001/produtos/abrirCrudProduto">📦 Produto</a></li>
-                        <li class="nav__submenu-item"><a href="http://localhost:3001/categorias/abrirCrudCategoria">🏷️ Categoria</a></li>
-                        <li class="nav__submenu-item"><a href="http://localhost:3001/pedido/abrirCrudPedido">🛒 Pedido</a></li>
-                        <li class="nav__submenu-item"><a href="http://localhost:3001/pagamento/abrirCrudPagamento">💳 Pagamento</a></li>
-                        <li class="nav__submenu-item"><a href="http://localhost:3001/forma_pagamentos/abrirCrudForma_pagamento">💰 Formas de Pagamento</a></li>
-                        <li class="nav__submenu-item"><a href="http://localhost:3001/pagamento_has_formapagamentos/abrirCrudpagamento_has_formapagamento">🔗 Pagamento e Formas</a></li>
+                        <li class="nav__submenu-item"><a href="./cadastros/pessoa.html">👥 Pessoas</a></li>
+                        <li class="nav__submenu-item"><a href="./cadastros/equipe.html">🏆 Equipes</a></li>
+                        <li class="nav__submenu-item"><a href="./cadastros/prova.html">🎯 Provas</a></li>
+                        <li class="nav__submenu-item"><a href="./cadastros/programacao.html">📅 Programação</a></li>
+                        <li class="nav__submenu-item"><a href="./cadastros/resultado.html">📊 Resultados</a></li>
+                        <li class="nav__submenu-item"><a href="./cadastros/produto.html">📦 Produtos Filantrópicos</a></li>
                     </ul>
                 </li>
                 
-                <li class="nav__menu-item"><a href="http://localhost:3001/cardapio/abrirCardapio">📋 Cardápio</a></li>
+                <!-- Menu Programação - Visível para TODOS -->
+                <li class="nav__menu-item"><a href="./programacao/programacao.html">📅 Programação</a></li>
                 
-                <li class="nav__menu-item" id="menuMinhasCompras" style="display: none;">
-                    <a href="./compras/compras.html">🛍️ Minhas Compras</a>
-                </li>
-                
+                <!-- Menu Blog - Visível para TODOS -->
                 <li class="nav__menu-item"><a href="./blog/blog.html">📰 Blog</a></li>
+                
+                <!-- Menu Contato - Visível para TODOS -->
                 <li class="nav__menu-item"><a href="./contato/contato.html">📞 Contato</a></li>
                 
+                <!-- Menu Relatórios - Visível apenas para PROFESSORES -->
                 <li class="nav__menu-item" id="menuRelatorios" style="display: none;">
                     <a href="#">📊 Relatórios</a>
                     <ul class="nav__submenu">
-                        <li class="nav__submenu-item"><a href="./relatorios/vendas-mensais.html">📈 Vendas Mensais</a></li>
-                        <li class="nav__submenu-item"><a href="./relatorios/produtos-mais-vendidos.html">🔥 Produtos Mais Vendidos</a></li>
-                        <li class="nav__submenu-item"><a href="./relatorios/clientes-mais-compram.html">⭐ Clientes Que Mais Compram</a></li>
+                        <li class="nav__submenu-item"><a href="./relatorios/ranking-equipes.html">🏆 Ranking de Equipes</a></li>
+                        <li class="nav__submenu-item"><a href="./relatorios/pontuacao-detalhada.html">📈 Pontuação Detalhada</a></li>
+                        <li class="nav__submenu-item"><a href="./relatorios/participacao.html">👥 Participação</a></li>
                     </ul>
                 </li>
                 
+                <!-- Menu Configurações - Visível apenas para PROFESSORES -->
                 <li class="nav__menu-item" id="menuConfiguracoes" style="display: none;">
                     <a href="#" onclick="abrirModalTema(); return false;">🎨 Personalizar Tema</a>
                 </li>
@@ -75,7 +77,7 @@
         <p id="footerText">&copy; 2025 - Sistema de Gincana</p>
     </footer>
 
-    <!-- Modal de Personalização de Tema -->
+    <!-- Modal de Personalização de Tema (apenas para professores) -->
     <div id="modalTema" class="custom-modal-overlay">
         <div class="custom-modal-content tema-modal">
             <div class="custom-modal-icon">🎨</div>

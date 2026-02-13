@@ -110,11 +110,6 @@
                                 </button>
                             </div>
                         </div>
-                        <div style="text-align: right; margin-top: -10px; margin-bottom: 15px;">
-                            <a href="forgot-password.html" class="link-esqueci-senha">
-                                🤔 Esqueci minha senha
-                            </a>
-                        </div>
                         <button type="submit" class="btn-submit">
                             <span class="btn-text">Entrar</span>
                             <span class="btn-icon">🚀</span>
@@ -133,17 +128,20 @@
                             <input type="text" id="regNome" name="nome" maxlength="100" placeholder="Seu nome aqui" required>
                         </div>
                         <div class="form-group">
-                            <label for="regCpf">
-                                <span class="label-icon">🆔</span> CPF:
-                            </label>
-                            <input type="text" id="regCpf" name="cpf" maxlength="14" placeholder="000.000.000-00" required>
-                            <small>Digite apenas números</small>
-                        </div>
-                        <div class="form-group">
                             <label for="regEmail">
                                 <span class="label-icon">📧</span> Email:
                             </label>
                             <input type="email" id="regEmail" name="email" maxlength="100" placeholder="seu@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regCargo">
+                                <span class="label-icon">🎓</span> Você é:
+                            </label>
+                            <select id="regCargo" name="cargo" required>
+                                <option value="aluno">🎓 Aluno</option>
+                                <option value="representante">👥 Representante de Turma</option>
+                
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="regSenha">

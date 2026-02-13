@@ -1,4 +1,4 @@
-// auth.js - Sistema de Autenticação com Debug e Logout Automático
+// auth.js - Sistema de Autenticação
 
 const API_URL = 'http://localhost:3001';
 
@@ -11,7 +11,7 @@ export function mostrarMensagem(elemento, texto, tipo) {
     console.log(`📢 Mensagem [${tipo}]:`, texto);
 }
 
-// Função para salvar dados no sessionStorage (ao invés de cookie com prazo longo)
+// Função para salvar dados no sessionStorage
 function salvarSessao(nome, valor) {
     sessionStorage.setItem(nome, valor);
     console.log(`💾 Sessão salva: ${nome} = ${valor}`);
@@ -48,6 +48,7 @@ export async function login(email, senha) {
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({ 
                 email_usuario: email,
                 senha_usuario: senha
@@ -59,38 +60,21 @@ export async function login(email, senha) {
         const data = await response.json();
         console.log('📦 Dados recebidos:', data);
 
-        // Verificar diferentes formatos de resposta
-        const loginSucesso = data.logged || data.status === "ok" || data.status === "success";
-        const usuario = data.user || data.usuario;
-
-        if (loginSucesso && usuario) {
+        if (data.logged && data.user) {
             console.log('✅ Login bem-sucedido!');
-            console.log('👤 Usuário:', usuario);
+            console.log('👤 Usuário:', data.user);
             
-            // Salvar na sessão (será apagado ao fechar o navegador)
-            salvarSessao('token', usuario.token || 'no-token');
-            salvarSessao('userId', usuario.id || usuario.cpf);
-            salvarSessao('userName', usuario.nome);
-            salvarSessao('userEmail', usuario.email);
-            salvarSessao('userType', usuario.is_funcionario ? 'funcionario' : 'cliente');
-            salvarSessao('userCargo', usuario.cargo || '');
+            // Salvar na sessão
+            salvarSessao('userId', data.user.id);
+            salvarSessao('userName', data.user.nome);
+            salvarSessao('userEmail', data.user.email);
+            salvarSessao('userCargo', data.user.cargo || 'aluno');
             
             console.log('🎉 Sessão criada com sucesso!');
-            console.log('⚠️ A sessão será apagada ao fechar o navegador');
             
-            // Verificar se foram salvos
-            console.log('🔍 Verificando dados da sessão:');
-            console.log('  - token:', lerSessao('token'));
-            console.log('  - userId:', lerSessao('userId'));
-            console.log('  - userName:', lerSessao('userName'));
-            console.log('  - userEmail:', lerSessao('userEmail'));
-            console.log('  - userType:', lerSessao('userType'));
-            console.log('  - userCargo:', lerSessao('userCargo'));
-            
-            // Retornar no formato esperado
             return {
                 logged: true,
-                user: usuario
+                user: data.user
             };
         } else {
             console.log('❌ Login falhou:', data.error || data.message || 'Erro desconhecido');
@@ -116,6 +100,7 @@ export async function registrar(user) {
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify(user)
         });
 
@@ -129,22 +114,12 @@ export async function registrar(user) {
             console.log('👤 Usuário:', data.user);
             
             // Salvar na sessão
-            salvarSessao('token', data.user.token || 'no-token');
-            salvarSessao('userId', data.user.id || data.user.cpf);
+            salvarSessao('userId', data.user.id);
             salvarSessao('userName', data.user.nome);
             salvarSessao('userEmail', data.user.email);
-            salvarSessao('userType', data.user.tipo || 'cliente');
-            salvarSessao('userCargo', data.user.cargo || '');
+            salvarSessao('userCargo', data.user.cargo || 'aluno');
             
             console.log('🎉 Sessão criada com sucesso!');
-            console.log('⚠️ A sessão será apagada ao fechar o navegador');
-            
-            // Verificar se foram salvos
-            console.log('🔍 Verificando dados da sessão:');
-            console.log('  - token:', lerSessao('token'));
-            console.log('  - userId:', lerSessao('userId'));
-            console.log('  - userName:', lerSessao('userName'));
-            console.log('  - userEmail:', lerSessao('userEmail'));
             
             return data;
         } else {
@@ -161,24 +136,24 @@ export async function registrar(user) {
 export function verificarLogin() {
     console.log('🔍 Verificando login...');
     
-    const token = lerSessao('token');
     const userId = lerSessao('userId');
     const userName = lerSessao('userName');
+    const userCargo = lerSessao('userCargo');
     
-    if (token && userId) {
-        console.log('✅ Usuário está logado!');
-        return {
-            logged: true,
-            user: {
-                id: userId,
-                nome: userName,
-                token: token
-            }
-        };
+    if (!userId || !userName) {
+        console.log('❌ Usuário não está logado');
+        return { logged: false };
     }
     
-    console.log('❌ Usuário não está logado');
-    return { logged: false };
+    console.log('✅ Usuário está logado!');
+    return {
+        logged: true,
+        user: {
+            id: userId,
+            nome: userName,
+            cargo: userCargo || 'aluno'
+        }
+    };
 }
 
 // Função de Logout
@@ -190,5 +165,5 @@ export function logout() {
     console.log('✅ Logout realizado com sucesso!');
 }
 
-// Exportar funções auxiliares também
+// Exportar funções auxiliares
 export { lerSessao as lerCookie, salvarSessao as salvarCookie, deletarSessao as deletarCookie };
